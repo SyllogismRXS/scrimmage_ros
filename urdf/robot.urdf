@@ -1,0 +1,48 @@
+<?xml version="1.0"?>
+
+<!-- NOTE: Original file taken from:https://github.com/MobileRobots/amr-ros-config -->
+<!-- main webpage: http://www.mobilerobots.com/Mobile_Robots.aspx -->
+
+<robot xmlns:sensor="http://playerstage.sourceforge.net/gazebo/xmlschema/#sensor"
+       xmlns:controller="http://playerstage.sourceforge.net/gazebo/xmlschema/#controller"
+       xmlns:interface="http://playerstage.sourceforge.net/gazebo/xmlschema/#interface"
+       xmlns:xacro="http://ros.org/wiki/xacro"
+       name="pioneer3at">
+
+
+  <!-- Chassis -->
+  <!-- ======================= -->
+  <link name="base_link">
+
+    <visual>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry>
+        <box size="1 1 1" />
+	  </geometry>      
+    </visual>
+
+    <collision>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry>
+        <box size="1 1 1" />
+	  </geometry>
+    </collision>
+  </link>
+
+  <!-- ======================= -->
+  <link name="base_laser">
+    <visual>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry>
+        <box size="0.1 0.1 0.1" />        
+      </geometry>
+    </visual>
+  </link>
+
+  <joint name="base_laser_joint" type="fixed">
+    <origin xyz="0 0 0" rpy="0 0 0"/>
+    <parent link="base_link"/>
+    <child link="base_laser"/>
+  </joint>
+  
+</robot>

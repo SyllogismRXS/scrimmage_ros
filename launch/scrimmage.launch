@@ -1,0 +1,45 @@
+<launch>
+  <!-- variables and inputs -->
+  <arg name="robot_name" default="robot1"/>
+  <arg name="map_name" default="simple-maze-1"/>
+  <arg name="run_rviz" default="true"/>
+  <arg name="control_wJoystick" default="true"/>
+
+  <arg name="initial_pose_x" default="10"/>
+  <arg name="initial_pose_y" default="10"/>
+  <arg name="initial_pose_z" default="0"/>
+  <arg name="initial_pose_yaw" default="0"/>
+
+  <!-- run the map server -->
+  <node name="map_server" pkg="map_server" type="map_server" args="$(find scrimmage_ros)/maps/$(arg map_name).yaml">
+    <param name="frame_id" value="/map" />
+  </node>
+    
+  <!--  amcl / move base / yocs waypoints -->  
+  
+  <group ns="$(arg robot_name)">
+    <node pkg="rviz" type="rviz" name="rviz"
+	      args="-d /home/syllogismrxs/.rviz/pioneer.rviz"
+	      if="$(arg run_rviz)">
+      <remap from="/move_base_simple/goal" to="move_base_simple/goal" />
+      <remap from="/initialpose" to="initialpose" />      
+    </node>
+
+
+    <!--
+        <include file="$(find teleop_twist_joy)/launch/teleop.launch"/>
+        <node pkg="gmapping" type="slam_gmapping" name="slam_gmapping" args="scan:=base_scan _odom_frame:=odom _base_frame:=base_link"/>
+    -->
+        
+    <include file="$(find scrimmage_ros)/launch/move_base.launch">
+      <arg name="robot_name" value="$(arg robot_name)"/>
+      <arg name="initial_pose_x" value="$(arg initial_pose_x)"/>
+      <arg name="initial_pose_y" value="$(arg initial_pose_y)"/>
+      <arg name="initial_pose_yaw" value="$(arg initial_pose_yaw)"/>      
+    </include>
+    
+  </group>
+    
+  <node pkg="scrimmage_ros" type="scrimmage_ros.py" name="scrimmage_ros" output="screen"/>    
+  
+</launch>
