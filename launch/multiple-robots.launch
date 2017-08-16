@@ -1,14 +1,18 @@
 <launch>
   <arg name="map_name" default="simple-maze-1"/>
   <arg name="run_rviz" default="true"/>
-
+  <arg name="mission_file" default="ros-ex1.xml"/>
+  
   <!-- run the map server, shared across robots -->
-  <node name="map_server" pkg="map_server" type="map_server" args="$(find scrimmage_ros)/maps/$(arg map_name).yaml">
+  <node name="map_server" pkg="map_server" type="map_server"
+        args="$(find scrimmage_ros)/maps/$(arg map_name).yaml">
     <param name="frame_id" value="/map" />
-  </node>
+  </node>  
 
   <!-- All robots share scrimmage_ros -->
-  <node pkg="scrimmage_ros" type="scrimmage_ros.py" name="scrimmage_ros" output="screen"/>
+  <node pkg="scrimmage_ros" type="scrimmage_ros.py" name="scrimmage_ros"
+        args="$(find scrimmage_ros)/missions/$(arg mission_file)"        
+        output="screen"/>
 
   <include file="$(find scrimmage_ros)/launch/robot.launch">
     <arg name="robot_name" value="robot1"/>
@@ -27,6 +31,6 @@
     <arg name="initial_pose_y" value="20"/>
     <arg name="initial_pose_yaw" value="0"/>
     <arg name="teleop" value="false" />
-  </include>  
-    
+  </include>
+  
 </launch>
