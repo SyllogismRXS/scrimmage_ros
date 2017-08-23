@@ -6,6 +6,10 @@ This repository provides an example for using the
 between SCRIMMAGE and ROS is almost identical to the interface between
 [stage\_ros](http://wiki.ros.org/stage_ros) and ROS.
 
+## Prerequisites
+
+You will need to build the SCRIMMAGE simulator
+
 ## Build
 
 1. Setup a ROS catkin workspace, if you don't have one already:
