@@ -17,6 +17,13 @@ find_package(catkin REQUIRED COMPONENTS
 ## System dependencies are found with CMake's conventions
 # find_package(Boost REQUIRED COMPONENTS system)
 
+# Allow scrimmage to find the maps in this repo:
+set(SCRIMMAGE_LOCAL_CONFIG_DIR "$ENV{HOME}/.scrimmage")
+set(SCRIMMAGE_ENV_DIR "${SCRIMMAGE_LOCAL_CONFIG_DIR}/env")
+file(MAKE_DIRECTORY ${SCRIMMAGE_ENV_DIR})
+configure_file(${CMAKE_SOURCE_DIR}/${PROJECT_NAME}/cmake/Modules/setenv.in
+  "${SCRIMMAGE_ENV_DIR}/${PROJECT_NAME}-setenv" @ONLY)
+execute_process(COMMAND bash "-c" "${CMAKE_SOURCE_DIR}/${PROJECT_NAME}/scripts/edit-config.sh ${SCRIMMAGE_LOCAL_CONFIG_DIR} ${PROJECT_NAME}" OUTPUT_VARIABLE result)
 
 ## Uncomment this if the package has a setup.py. This macro ensures
 ## modules and global scripts declared therein get installed

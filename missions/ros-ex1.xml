@@ -16,7 +16,7 @@
 
   <grid_spacing>10</grid_spacing>
   <grid_size>200</grid_size>
-  <!--<terrain>mcmillan</terrain>-->
+  
   <background_color>191 191 191</background_color> <!-- Red Green Blue -->
   <gui_update_period>10</gui_update_period> <!-- milliseconds -->
 
@@ -32,9 +32,8 @@
   <show_origin>true</show_origin>
   <origin_length>10</origin_length>
 
-  <!--<entity_interaction order="0">SimpleCollision</entity_interaction>-->
-  <entity_interaction order="0">MapGen2D</entity_interaction>
-  <entity_interaction order="1" enable_collision_detection="true">BulletCollision</entity_interaction>
+  <entity_interaction order="0" map="simple-maze-1">MapGen2D</entity_interaction>
+  <entity_interaction order="1" enable_collision_detection="false">BulletCollision</entity_interaction>
 
   <!-- uncomment "seed" and use integer for deterministic results -->
   <!--<seed>1714060370</seed>-->

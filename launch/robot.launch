@@ -1,7 +1,6 @@
 <launch>
   <!-- variables and inputs -->
-  <arg name="robot_name" default="robot1"/>
-  <arg name="map_name" default="simple-maze-1"/>
+  <arg name="robot_name" default="robot1"/>  
   <arg name="run_rviz" default="true"/>
   <arg name="teleop" default="false" />  
   
