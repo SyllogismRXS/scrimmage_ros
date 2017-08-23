@@ -45,16 +45,16 @@
     <color>77 77 255</color>
     <count>1</count>
     <health>1</health>
-    
-    <sensor order="0">RayTrace</sensor>
+
+    <sensor order="0" xyz="1.2 0 0.1" rpy="0 0 0">RayTrace</sensor>
 
     <x>10</x>
     <y>10</y>
-    <z>0</z>
+    <z>0.42</z>
     <heading>0</heading>
-    
+
     <controller>UnicycleControllerDirect</controller>
-    <motion_model>Unicycle</motion_model>    
+    <motion_model>Unicycle</motion_model>
     <visual_model>volkswagen</visual_model>
     <autonomy>ROSAutonomy</autonomy>
   </entity>
@@ -65,19 +65,18 @@
     <color>0 0 255</color>
     <count>1</count>
     <health>1</health>
-    
-    <sensor order="0">RayTrace</sensor>
+
+    <sensor order="0" xyz="1.2 0 0.1" rpy="0 0 0">RayTrace</sensor>
 
     <x>10</x>
     <y>20</y>
-    <z>0</z>
+    <z>0.42</z>
     <heading>0</heading>
-    
+
     <controller>UnicycleControllerDirect</controller>
-    <motion_model>Unicycle</motion_model>    
+    <motion_model>Unicycle</motion_model>
     <visual_model>volkswagen</visual_model>
     <autonomy>ROSAutonomy</autonomy>
-  </entity>
+    </entity>
 
-  
 </runscript>
