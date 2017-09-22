@@ -12,6 +12,8 @@ find_package(catkin REQUIRED COMPONENTS
   roscpp
   sensor_msgs
   std_msgs
+  geometry_msgs
+  message_generation
 )
 
 ## System dependencies are found with CMake's conventions
@@ -54,12 +56,12 @@ execute_process(COMMAND bash "-c" "${CMAKE_SOURCE_DIR}/${PROJECT_NAME}/scripts/e
 ##   * uncomment the generate_messages entry below
 ##   * add every package in MSG_DEP_SET to generate_messages(DEPENDENCIES ...)
 
-## Generate messages in the 'msg' folder
-# add_message_files(
-#   FILES
-#   Message1.msg
-#   Message2.msg
-# )
+# Generate messages in the 'msg' folder
+add_message_files(DIRECTORY msg FILES
+  ID.msg
+  Contact.msg
+  ContactArray.msg
+)
 
 ## Generate services in the 'srv' folder
 # add_service_files(
@@ -76,10 +78,7 @@ execute_process(COMMAND bash "-c" "${CMAKE_SOURCE_DIR}/${PROJECT_NAME}/scripts/e
 # )
 
 ## Generate added messages and services with any dependencies listed here
-# generate_messages(
-#   DEPENDENCIES
-#   sensor_msgs#   std_msgs
-# )
+generate_messages(DEPENDENCIES geometry_msgs)
 
 ################################################
 ## Declare ROS dynamic reconfigure parameters ##
@@ -112,8 +111,8 @@ execute_process(COMMAND bash "-c" "${CMAKE_SOURCE_DIR}/${PROJECT_NAME}/scripts/e
 ## DEPENDS: system dependencies of this project that dependent projects also need
 catkin_package(
 #  INCLUDE_DIRS include
-#  LIBRARIES scrimmage_ros
-#  CATKIN_DEPENDS roscpp roscpp sensor_msgs std_msgs
+ # LIBRARIES scrimmage_ros
+ CATKIN_DEPENDS roscpp roscpp sensor_msgs std_msgs geometry_msgs
 #  DEPENDS system_lib
 )
 
