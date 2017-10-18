@@ -31,9 +31,9 @@
   <altitude_origin>300</altitude_origin>
   <show_origin>true</show_origin>
   <origin_length>10</origin_length>
-
-  <entity_interaction order="0" map="simple-maze-1">MapGen2D</entity_interaction>
-  <entity_interaction order="1" enable_collision_detection="false">BulletCollision</entity_interaction>
+  
+  <entity_interaction order="0" enable_collision_detection="false" show_rays="true">BulletCollision</entity_interaction>
+  <entity_interaction order="1" map="simple-maze-1">MapGen2D</entity_interaction>
 
   <!-- uncomment "seed" and use integer for deterministic results -->
   <!--<seed>1714060370</seed>-->
