@@ -22,7 +22,6 @@ ScrimmageAutonomy::ScrimmageAutonomy() : valid_own_pose_(false),
                                          valid_contact_list_msg_(false),
                                          initScrimmagePluginStatus_(false)
 {
-    //external_.set_max_entities(100);
 }
 
 bool ScrimmageAutonomy::init(int argc, char *argv[], std::string node_name){
@@ -47,7 +46,6 @@ bool ScrimmageAutonomy::init(int argc, char *argv[], std::string node_name){
 bool ScrimmageAutonomy::setup_publishers()
 {
     goal_pub_ = nh_->advertise<move_base_msgs::MoveBaseActionGoal>("move_base/goal", 1);
-    herding_goal_pub_ = nh_->advertise<visualization_msgs::Marker>("herding_goal", 1);
     return true;
 }
 
@@ -97,7 +95,6 @@ bool ScrimmageAutonomy::init_scrimmage()
     private_nh.param("name_prefix", name_prefix, std::string("robot"));
     private_nh.param("robot_id", robot_id, 1);
     private_nh.param("wp_forw_time", wp_forw_time_, 1.0);
-    private_nh.param("visualize_herding_goal", visualize_herding_goal_, false);
 
     id_ = sc::ID(robot_id, -1, team_id);
     cout << "Own ID: " << id_.id() << endl;
@@ -173,8 +170,6 @@ bool ScrimmageAutonomy::update_contacts()
         return false;
     }
 
-    //update_own_state(); // update through contacts for now
-
     sc::RTreePtr &rtree = autonomy_->rtree();
     rtree->init(contact_list_msg_.contact_list.size());
     rtree->clear();
@@ -246,34 +241,6 @@ bool ScrimmageAutonomy::wait_until_ready()
     return true;
 }
 
-visualization_msgs::Marker ScrimmageAutonomy::setup_herding_marker(Eigen::Vector3d goal)
-{
-    visualization_msgs::Marker marker;
-    marker.header.frame_id = "/map";
-    marker.header.stamp = ros::Time::now();
-    marker.ns = "herding goal";
-    marker.id = 0;
-    marker.type = visualization_msgs::Marker::SPHERE;
-    marker.action = visualization_msgs::Marker::ADD;
-    marker.pose.position.x = goal(0);
-    marker.pose.position.y = goal(1);
-    marker.pose.position.z = goal(2);
-    marker.pose.orientation.x = 0.0;
-    marker.pose.orientation.y = 0.0;
-    marker.pose.orientation.z = 0.0;
-    marker.pose.orientation.w = 1.0;
-    marker.scale.x = 0.6;
-    marker.scale.y = 0.6;
-    marker.scale.z = 0.6;
-    marker.color.r = 0;
-    marker.color.g = 100;
-    marker.color.b = 0;
-    marker.color.a = 1.0;
-    marker.lifetime = ros::Duration(5);
-
-    return marker;
-}
-
 bool ScrimmageAutonomy::run()
 {
     wait_until_ready();
@@ -292,10 +259,6 @@ bool ScrimmageAutonomy::run()
 
     ros::Time prev_time = ros::Time::now();
     ros::Duration one_sec(1.0);
-
-    // TODO: read goal value from Herder.xml mission file
-    Eigen::Vector3d herding_goal(-7.0, -4.5, 0.0);
-    visualization_msgs::Marker herding_marker = setup_herding_marker(herding_goal);
 
     while (ros::ok()) {
         ros::Time now = ros::Time::now();
@@ -344,9 +307,6 @@ bool ScrimmageAutonomy::run()
             goal.header.stamp = ros::Time::now();
             goal_pub_.publish(goal);
         }
-
-        if (visualize_herding_goal_)
-            herding_goal_pub_.publish(herding_marker);
 
         ros::spinOnce();
         loop_rate_->sleep();

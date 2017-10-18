@@ -1,5 +1,5 @@
-#ifndef SCRIMMAGE_AUTONOMY_H_
-#define SCRIMMAGE_AUTONOMY_H_
+#ifndef SCRIMMAGE_ROS_SCRIMMAGE_AUTONOMY_H_
+#define SCRIMMAGE_ROS_SCRIMMAGE_AUTONOMY_H_
 
 #include <scrimmage/entity/External.h>
 #include <scrimmage/entity/Contact.h>
@@ -32,17 +32,15 @@ public:
     bool update_own_state();
     bool add_contact(scrimmage::ID id);
 
-    visualization_msgs::Marker setup_herding_marker(Eigen::Vector3d goal);
-
     void contact_list_cb(const scrimmage_ros::ContactArray::ConstPtr& msg);
     void amcl_pose_cb(const geometry_msgs::PoseWithCovarianceStamped::ConstPtr& msg);
+
 protected:
     std::string node_name_;
     std::shared_ptr<ros::NodeHandle> nh_;
     std::shared_ptr<ros::Rate> loop_rate_;
 
     ros::Publisher goal_pub_;
-    ros::Publisher herding_goal_pub_;
     ros::Subscriber contact_list_sub_;
     ros::Subscriber amcl_pose_sub_;
 
@@ -62,8 +60,6 @@ protected:
     std::string name_prefix;
     ControlMode_t control_mode_;
     double wp_forw_time_;
-
-    bool visualize_herding_goal_;
 
 private:
 };
