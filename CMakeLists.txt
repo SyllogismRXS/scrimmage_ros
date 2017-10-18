@@ -9,23 +9,17 @@ project(scrimmage_ros)
 ## is used, also find other catkin packages
 find_package(catkin REQUIRED COMPONENTS
   roscpp
-  roscpp
+  rospy
   sensor_msgs
   std_msgs
+  nav_msgs
   geometry_msgs
+  tf
   message_generation
 )
 
 ## System dependencies are found with CMake's conventions
 # find_package(Boost REQUIRED COMPONENTS system)
-
-# Allow scrimmage to find the maps in this repo:
-set(SCRIMMAGE_LOCAL_CONFIG_DIR "$ENV{HOME}/.scrimmage")
-set(SCRIMMAGE_ENV_DIR "${SCRIMMAGE_LOCAL_CONFIG_DIR}/env")
-file(MAKE_DIRECTORY ${SCRIMMAGE_ENV_DIR})
-configure_file(${CMAKE_SOURCE_DIR}/${PROJECT_NAME}/cmake/Modules/setenv.in
-  "${SCRIMMAGE_ENV_DIR}/${PROJECT_NAME}-setenv" @ONLY)
-execute_process(COMMAND bash "-c" "${CMAKE_SOURCE_DIR}/${PROJECT_NAME}/scripts/edit-config.sh ${SCRIMMAGE_LOCAL_CONFIG_DIR} ${PROJECT_NAME}" OUTPUT_VARIABLE result)
 
 ## Uncomment this if the package has a setup.py. This macro ensures
 ## modules and global scripts declared therein get installed
@@ -122,7 +116,7 @@ catkin_package(
 
 ## Specify additional locations of header files
 ## Your package locations should be listed before other locations
-# include_directories(include)
+include_directories(include)
 include_directories(
   ${catkin_INCLUDE_DIRS}
 )
@@ -156,6 +150,46 @@ include_directories(
 # target_link_libraries(${PROJECT_NAME}_node
 #   ${catkin_LIBRARIES}
 # )
+
+###############################################################################
+# SCRIMMAGE CONFIGURATION
+###############################################################################
+set(CMAKE_CXX_STANDARD 14)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall")
+
+set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -Wall") # -fprofile-arcs -ftest-coverage")
+set(CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG} -Wall") # -fprofile-arcs -ftest-coverage")
+
+option(ADD_HOME_LOCAL_PREFIX "Add ~/.local to cmake prefix" OFF)
+if(ADD_HOME_LOCAL_PREFIX)
+  set(CMAKE_PREFIX_PATH $ENV{HOME}/.local/ ${CMAKE_PREFIX_PATH})
+endif()
+
+find_package(scrimmage)
+include_directories(${SCRIMMAGE_INCLUDE_DIRS})
+
+# Allow scrimmage to find the maps in this repo:
+set(SCRIMMAGE_LOCAL_CONFIG_DIR "$ENV{HOME}/.scrimmage")
+set(SCRIMMAGE_ENV_DIR "${SCRIMMAGE_LOCAL_CONFIG_DIR}/env")
+file(MAKE_DIRECTORY ${SCRIMMAGE_ENV_DIR})
+configure_file(${CMAKE_SOURCE_DIR}/${PROJECT_NAME}/cmake/Modules/setenv.in
+  "${SCRIMMAGE_ENV_DIR}/${PROJECT_NAME}-setenv" @ONLY)
+execute_process(COMMAND bash "-c" "${CMAKE_SOURCE_DIR}/${PROJECT_NAME}/scripts/edit-config.sh ${SCRIMMAGE_LOCAL_CONFIG_DIR} ${PROJECT_NAME}" OUTPUT_VARIABLE result)
+
+################################################
+# Find packages required by scrimmage plugins
+###############################################
+find_package(Protobuf 3.3.0 REQUIRED)
+include_directories(${PROTOBUF_INCLUDE_DIRS})
+find_package(Eigen3 REQUIRED)
+include_directories(${EIGEN3_INCLUDE_DIR})
+
+# Create the scrimmage_autonomy node
+add_executable(scrimmage_autonomy_node src/scrimmage_autonomy.cpp)
+set_target_properties(scrimmage_autonomy_node PROPERTIES scrimmage_autonomy_node node PREFIX "")
+target_link_libraries(scrimmage_autonomy_node ${catkin_LIBRARIES} ${SCRIMMAGE_LIBRARIES})
+add_dependencies(scrimmage_autonomy_node ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 
 #############
 ## Install ##
