@@ -1,11 +1,19 @@
 <launch>
   <arg name="mission_file" default="user-control-jsbsim.xml"/>
+  <arg name="robot_id" default="1"/>
+  <arg name="robot_name" default="robot$(arg robot_id)"/>
 
   <param name ="/use_sim_time" value="true"/>
 
   <!-- All robots share scrimmage_ros -->
   <node pkg="scrimmage_ros" type="scrimmage_ros.py" name="scrimmage_ros"
         args="$(find scrimmage_ros)/missions/$(arg mission_file)"
-        output="screen"/>  
-  
+        output="screen"/>
+
+  <group ns="$(arg robot_name)">
+    <node pkg="teleop_twist_keyboard" type="teleop_twist_keyboard.py"
+          name="teleop_twist_keyboard"
+          output="screen"/>
+  </group>
+
 </launch>
