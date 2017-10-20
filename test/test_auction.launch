@@ -1,0 +1,16 @@
+<launch>
+  <node
+    pkg="scrimmage_ros"
+    name="auctioneer1"
+    type="auctioneer"
+    output="screen"
+    args="1"/>
+  <node
+    pkg="scrimmage_ros"
+    name="auctioneer2"
+    type="auctioneer"
+    output="screen"
+    args="2"/>
+  <test test-name="test_auction" pkg="scrimmage_ros" type="test_auction" />
+</launch> 
+

@@ -55,6 +55,7 @@ add_message_files(DIRECTORY msg FILES
   ID.msg
   Contact.msg
   ContactArray.msg
+  RosBidAuction.msg
 )
 
 ## Generate services in the 'srv' folder
@@ -169,6 +170,26 @@ endif()
 find_package(scrimmage)
 include_directories(${SCRIMMAGE_INCLUDE_DIRS})
 
+if (SCRIMMAGE_ENABLE_PYTHON_BINDINGS)
+
+  add_definitions(-DENABLE_PYTHON_BINDINGS=1)
+  find_package(PythonInterp ${SCRIMMAGE_PYTHONLIBS_VERSION_STRING} REQUIRED)
+  find_package(PythonLibs ${SCRIMMAGE_PYTHONLIBS_VERSION_STRING} REQUIRED)
+
+  message(STATUS "Python Versions Found: ${PYTHONLIBS_VERSION_STRING}")
+  message(STATUS "PYTHON_LIBRARIES : ${PYTHON_LIBRARIES}")
+  message(STATUS "PYTHON_INCLUDE_DIRS: ${PYTHON_INCLUDE_DIRS}")
+
+  set(PYTHON_FOUND TRUE)
+  find_package(pybind11 REQUIRED)
+  include_directories(${pybind11_INCLUDE_DIRS})
+  set(PYBIND11_INCLUDE_DIRS ${pybind11_INCLUDE_DIRS})
+  include_directories("${PYTHON_INCLUDE_DIRS}")
+
+else()
+  add_definitions(-DENABLE_PYTHON_BINDINGS=0)
+endif()
+
 # Allow scrimmage to find the maps in this repo:
 set(SCRIMMAGE_LOCAL_CONFIG_DIR "$ENV{HOME}/.scrimmage")
 set(SCRIMMAGE_ENV_DIR "${SCRIMMAGE_LOCAL_CONFIG_DIR}/env")
@@ -190,6 +211,11 @@ add_executable(scrimmage_autonomy_node src/scrimmage_autonomy.cpp)
 set_target_properties(scrimmage_autonomy_node PROPERTIES scrimmage_autonomy_node node PREFIX "")
 target_link_libraries(scrimmage_autonomy_node ${catkin_LIBRARIES} ${SCRIMMAGE_LIBRARIES})
 add_dependencies(scrimmage_autonomy_node ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+
+# the auction node
+add_executable(auctioneer src/auctioneer.cpp)
+target_link_libraries(auctioneer ${catkin_LIBRARIES} ${SCRIMMAGE_LIBRARIES})
+add_dependencies(auctioneer scrimmage_ros_generate_messages_cpp)
 
 #############
 ## Install ##
@@ -238,3 +264,6 @@ add_dependencies(scrimmage_autonomy_node ${${PROJECT_NAME}_EXPORTED_TARGETS} ${c
 
 ## Add folders to be run by python nosetests
 # catkin_add_nosetests(test)
+find_package(rostest REQUIRED)
+add_rostest_gtest(test_auction test/test_auction.launch test/test_auction.cpp)
+target_link_libraries(test_auction ${catkin_LIBRARIES} ${SCRIMMAGE_LIBRARIES} gtest_main)

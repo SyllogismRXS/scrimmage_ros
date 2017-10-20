@@ -1,0 +1,15 @@
+<launch>
+  <node
+    launch-prefix="gdb -x ~/scrimmage/.gdbinit -f --args"
+    pkg="scrimmage_ros"
+    name="auctioneer1"
+    type="auctioneer"
+    output="screen"
+    args="1"/>
+  <node
+    pkg="scrimmage_ros"
+    name="auctioneer2"
+    type="auctioneer"
+    output="screen"
+    args="2"/>
+</launch> 
