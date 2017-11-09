@@ -56,8 +56,8 @@
     <heading>0</heading>
 
     <autonomy>ROSControl</autonomy>
-    <controller>UnicycleControllerDirect</controller>
-    <motion_model vel_max="50" turn_rate_max="50" pitch_rate_max="50">Unicycle</motion_model>
+    <controller>Unicycle3DControllerDirect</controller>
+    <motion_model vel_max="50" turn_rate_max="50" pitch_rate_max="50">Unicycle3D</motion_model>
     <visual_model>zephyr-blue</visual_model>
 
   </entity>
