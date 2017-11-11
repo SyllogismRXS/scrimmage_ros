@@ -12,7 +12,7 @@
   <stream_port>50051</stream_port>
   <stream_ip>localhost</stream_ip>
 
-  <end_condition>none</end_condition> <!-- time, one_team, none-->
+  <end_condition>all_dead</end_condition> <!-- time, one_team, none-->
 
   <grid_spacing>10</grid_spacing>
   <grid_size>1000</grid_size>
@@ -55,8 +55,8 @@
     <z>200</z>
     <heading>0</heading>
 
-    <autonomy order="0">ROSControl</autonomy>
-    <autonomy order="1" enable_playback="true">TrajectoryRecordPlayback</autonomy>
+    <autonomy>ROSControl</autonomy>
+    <autonomy enable_playback="true" remove_at_end="true">TrajectoryRecordPlayback</autonomy>
     <controller>Unicycle3DControllerDirect</controller>
     <motion_model vel_max="50" turn_rate_max="50" pitch_rate_max="50">Unicycle3D</motion_model>
     <visual_model>zephyr-blue</visual_model>
