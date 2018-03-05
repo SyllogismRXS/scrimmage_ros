@@ -1,0 +1,14 @@
+<launch>
+
+  <arg name="mission_file" default="~/scrimmage/scrimmage/missions/straight.xml"/>  
+  <arg name="entity_name" default="uav_entity"/>
+  
+  <node pkg="scrimmage_ros"
+        name="entity_1"
+        type="entity"
+        output="screen">
+    <param name="mission_file" value="$(arg mission_file)"/>
+    <param name="entity_name" value="$(arg entity_name)"/>
+  </node>
+  
+</launch> 
