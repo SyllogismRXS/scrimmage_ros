@@ -37,6 +37,7 @@
 #include <scrimmage/entity/Entity.h>
 #include <scrimmage/entity/External.h>
 #include <scrimmage/pubsub/Message.h>
+#include <scrimmage/pubsub/PubSub.h>
 #include <scrimmage/msgs/AuctionMsgs.pb.h>
 
 #include <scrimmage_ros/RosBidAuction.h>
@@ -51,70 +52,75 @@ using scrimmage_ros::RosBidAuction;
 
 sc::MessageBase ros2sc_start_auction(const std_msgs::Int16 &ros_msg) {
     sc::MessageBase sc_msg;
-    sc_msg.sender = ros_msg.data;
+    // sc_msg.sender = ros_msg.data;
     return sc_msg;
 }
 
 std_msgs::Int16 sc2ros_start_auction(const sc::MessageBasePtr &sc_msg) {
     std_msgs::Int16 ros_msg;
-    ros_msg.data = sc_msg->sender;
+    // ros_msg.data = sc_msg->sender;
     return ros_msg;
 }
 
 BidMsg ros2sc_bid_auction(const RosBidAuction &ros_msg) {
     BidMsg sc_msg;
-    sc_msg.sender = ros_msg.id;
+    // sc_msg.sender = ros_msg.id;
     sc_msg.data.set_bid(ros_msg.bid);
     return sc_msg;
 }
 
 RosBidAuction sc2ros_bid_auction(const std::shared_ptr<BidMsg> &sc_msg) {
     RosBidAuction ros_msg;
-    ros_msg.id = sc_msg->sender;
+    // ros_msg.id = sc_msg->sender;
     ros_msg.bid = sc_msg->data.bid();
     return ros_msg;
 }
 
 int main(int argc, char **argv) {
-    if (argc < 2) {
-        std::cout << "need an argument for id" << std::endl;
-        return 1;
-    }
-
 #if ENABLE_PYTHON_BINDINGS == 1
     Py_Initialize();
 #endif
 
-    sc::ID id(std::stoi(argv[1]), 0, 0);
     ros::init(argc, argv, "auctioneer");
 
     ros::NodeHandle nh;
 
-    std::map<std::string, std::string> info
-        {{"x", "0"}, {"y", "0"}, {"autonomy0", "AuctionAssign"}};
+    ros::NodeHandle private_nh("~");
+
+    std::string mission_file;
+    private_nh.param("mission_file", mission_file, std::string(""));
+
+    // Get the entity ID
+    int entity_id;
+    private_nh.param("entity_id", entity_id, 1);
+
+    std::string entity_name;
+    private_nh.param("entity_name", entity_name, std::string("UNDEFINED"));
+
+    int max_contacts;
+    private_nh.param("max_contacts", max_contacts, 100);
 
     sc::External external;
-    external.create_entity(100, id, info, "/tmp");
-
-    auto pubs = external.entity()->autonomies().front()->pubs();
+    external.create_entity(mission_file, max_contacts, entity_id, entity_name);
 
     ros::Publisher pub_start_auction =
         nh.advertise<std_msgs::Int16>("StartAuction", 1000);
-    external.pub_cb(sc2ros_start_auction,
-        pubs["StartAuction"], pub_start_auction);
+
+    external.pub_cb("SphereNetwork", "StartAuction", sc2ros_start_auction,
+                    pub_start_auction);
 
     ros::Publisher pub_bid_auction =
         nh.advertise<RosBidAuction>("BidAuction", 1000);
-    external.pub_cb<auction::BidAuction>(sc2ros_bid_auction,
-        pubs["BidAuction"], pub_bid_auction);
-
-    auto subs = external.entity()->autonomies().front()->subs();
-
-    ros::Subscriber sub_start_auction = nh.subscribe("StartAuction", 1000,
-        external.sub_cb<std_msgs::Int16>(ros2sc_start_auction, subs["StartAuction"]));
-
-    ros::Subscriber sub_bid_auction = nh.subscribe("BidAuction", 1000,
-        external.sub_cb<RosBidAuction>(ros2sc_bid_auction, subs["BidAuction"]));
+    external.pub_cb<auction::BidAuction>("SphereNetwork", "BidAuction",
+                                         sc2ros_bid_auction, pub_bid_auction);
+    //
+    // auto subs = external.entity()->autonomies().front()->subs();
+    //
+    // ros::Subscriber sub_start_auction = nh.subscribe("StartAuction", 1000,
+    //     external.sub_cb<std_msgs::Int16>(ros2sc_start_auction, subs["StartAuction"]));
+    //
+    // ros::Subscriber sub_bid_auction = nh.subscribe("BidAuction", 1000,
+    //     external.sub_cb<RosBidAuction>(ros2sc_bid_auction, subs["BidAuction"]));
 
     const double loop_rate_hz = 10;
     const double startup_delay = 1;

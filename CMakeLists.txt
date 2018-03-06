@@ -206,16 +206,16 @@ include_directories(${PROTOBUF_INCLUDE_DIRS})
 find_package(Eigen3 REQUIRED)
 include_directories(${EIGEN3_INCLUDE_DIR})
 
-# Create the scrimmage_autonomy node
-add_executable(scrimmage_autonomy_node src/scrimmage_autonomy.cpp)
-set_target_properties(scrimmage_autonomy_node PROPERTIES scrimmage_autonomy_node node PREFIX "")
-target_link_libraries(scrimmage_autonomy_node ${catkin_LIBRARIES} ${SCRIMMAGE_LIBRARIES})
-add_dependencies(scrimmage_autonomy_node ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+# # Create the scrimmage_autonomy node
+# add_executable(scrimmage_autonomy_node src/scrimmage_autonomy.cpp)
+# set_target_properties(scrimmage_autonomy_node PROPERTIES scrimmage_autonomy_node node PREFIX "")
+# target_link_libraries(scrimmage_autonomy_node ${catkin_LIBRARIES} ${SCRIMMAGE_LIBRARIES})
+# add_dependencies(scrimmage_autonomy_node ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 
-# # the auction node
-# add_executable(auctioneer src/auctioneer.cpp)
-# target_link_libraries(auctioneer ${catkin_LIBRARIES} ${SCRIMMAGE_LIBRARIES})
-# add_dependencies(auctioneer scrimmage_ros_generate_messages_cpp)
+# the auction node
+add_executable(auctioneer src/auctioneer.cpp)
+target_link_libraries(auctioneer ${catkin_LIBRARIES} ${SCRIMMAGE_LIBRARIES})
+add_dependencies(auctioneer scrimmage_ros_generate_messages_cpp)
 
 add_executable(entity src/entity.cpp)
 target_link_libraries(entity ${catkin_LIBRARIES} ${SCRIMMAGE_LIBRARIES})
