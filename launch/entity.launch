@@ -7,8 +7,8 @@
         name="entity_1"
         type="entity"
         output="screen">
-    <param name="mission_file" value="$(arg mission_file)"/>
-    <param name="entity_name" value="$(arg entity_name)"/>
+    <param name="mission_file" value="$(arg mission_file)" type="str"/>
+    <param name="entity_name" value="$(arg entity_name)" type="str"/>
   </node>
   
 </launch> 

@@ -6,6 +6,8 @@
 
 #include <scrimmage/common/RTree.h>
 #include <scrimmage/math/State.h>
+#include <scrimmage/parse/ParseUtils.h>
+#include <scrimmage/log/Log.h>
 
 #include "ros/ros.h"
 #include <tf/tf.h>
@@ -32,10 +34,58 @@ bool Entity::init(int argc, char *argv[], std::string node_name){
     private_nh.param("loop_rate", loop_rate, 10.0);
     loop_rate_ = std::make_shared<ros::Rate>(loop_rate);
 
-    private_nh.param("mission_file", mission_file_);
+    private_nh.getParam("mission_file", mission_file_);
+    mission_file_ = sc::expand_user(mission_file_);
 
+    if (mission_file_ == "") {
+        cout << "SCRIMMAGE mission file not set" << endl;
+        return false;
+    }
+
+    // Setup mission parser
     mp_ = std::make_shared<sc::MissionParse>();
+    if (!mp_->parse(mission_file_)) {
+        cout << "Failed to parse file: " << mission_file_ << endl;
+        return false;
+    }
 
+    std::string entity_name;
+    private_nh.getParam("entity_name", entity_name);
+    cout << "Entity name: " << entity_name << endl;
+    if (mp_->entity_name_to_id().count(entity_name)) {
+    }
+
+    // Parse output type
+    std::string output_type = sc::get("output_type", mp_->params(), std::string("frames"));
+    bool output_all = output_type.find("all") != std::string::npos;
+    auto should_log = [&](std::string s) {
+        return output_all || output_type.find(s) != std::string::npos;
+    };
+
+    bool output_frames = should_log("frames");
+    bool output_summary = should_log("summary");
+    bool output_git = should_log("git_commits");
+    bool output_mission = should_log("mission");
+    bool output_seed = should_log("seed");
+    bool output_nothing =
+        !output_all && !output_frames && !output_summary &&
+        !output_git && !output_mission && !output_seed;
+
+    if (!output_nothing) {
+        mp_->create_log_dir();
+    }
+
+    // Setup Logger
+    log_ = std::make_shared<sc::Log>();
+    if (output_frames) {
+        log_->set_enable_log(true);
+        log_->init(mp_->log_dir(), sc::Log::WRITE);
+    } else {
+        log_->set_enable_log(false);
+        log_->init(mp_->log_dir(), sc::Log::NONE);
+    }
+
+    // Find "name" for our desired entity_name block
 
     setup_publishers();
     setup_subscribers();
@@ -320,7 +370,10 @@ bool Entity::run()
 int main(int argc, char **argv)
 {
     scrimmage_ros::Entity entity;
-    entity.init(argc, argv, "scrimmage_autonomy");
+    if (!entity.init(argc, argv, "scrimmage_entity")) {
+        cout << "Failed to initialize entity" << endl;
+        return -1;
+    }
     if (!entity.run()) {
         return -2;
     }

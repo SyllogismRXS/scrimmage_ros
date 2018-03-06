@@ -51,6 +51,7 @@ protected:
 
     std::string mission_file_ = "";
     sc::MissionParsePtr mp_;
+    std::shared_ptr<sc::Log> log_;
 
 private:
 };
