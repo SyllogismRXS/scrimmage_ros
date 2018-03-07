@@ -12,7 +12,7 @@
     <param name="entity_name" value="agent" type="str"/>
     <param name="entity_id" value="1" type="int"/>    
   </node>
-
+  
   <node pkg="scrimmage_ros"
         name="entity_2"
         type="auctioneer"
@@ -21,6 +21,16 @@
     <param name="max_contacts" value="$(arg max_contacts)" type="int"/>
     <param name="entity_name" value="agent" type="str"/>
     <param name="entity_id" value="2" type="int"/>    
+  </node>
+
+  <node pkg="scrimmage_ros"
+        name="entity_3"
+        type="auctioneer"
+        output="screen">
+    <param name="mission_file" value="$(arg mission_file)" type="str"/>
+    <param name="max_contacts" value="$(arg max_contacts)" type="int"/>
+    <param name="entity_name" value="agent" type="str"/>
+    <param name="entity_id" value="3" type="int"/>    
   </node>
   
 </launch> 

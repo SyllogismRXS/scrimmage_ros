@@ -1,16 +1,36 @@
 <launch>
-  <node
-    pkg="scrimmage_ros"
-    name="auctioneer1"
-    type="auctioneer"
-    output="screen"
-    args="1"/>
-  <node
-    pkg="scrimmage_ros"
-    name="auctioneer2"
-    type="auctioneer"
-    output="screen"
-    args="2"/>
-  <test test-name="test_auction" pkg="scrimmage_ros" type="test_auction" />
-</launch> 
 
+  <arg name="mission_file" default="~/scrimmage/scrimmage/missions/auction_assign.xml"/>  
+  <arg name="max_contacts" default="100"/>
+  
+  <node pkg="scrimmage_ros"
+        name="entity_1"
+        type="auctioneer"
+        output="screen">
+    <param name="mission_file" value="$(arg mission_file)" type="str"/>
+    <param name="max_contacts" value="$(arg max_contacts)" type="int"/>
+    <param name="entity_name" value="agent" type="str"/>
+    <param name="entity_id" value="1" type="int"/>    
+  </node>
+  
+  <node pkg="scrimmage_ros"
+        name="entity_2"
+        type="auctioneer"
+        output="screen">
+    <param name="mission_file" value="$(arg mission_file)" type="str"/>
+    <param name="max_contacts" value="$(arg max_contacts)" type="int"/>
+    <param name="entity_name" value="agent" type="str"/>
+    <param name="entity_id" value="2" type="int"/>    
+  </node>
+
+  <node pkg="scrimmage_ros"
+        name="entity_3"
+        type="auctioneer"
+        output="screen">
+    <param name="mission_file" value="$(arg mission_file)" type="str"/>
+    <param name="max_contacts" value="$(arg max_contacts)" type="int"/>
+    <param name="entity_name" value="agent" type="str"/>
+    <param name="entity_id" value="3" type="int"/>    
+  </node>
+  
+</launch> 

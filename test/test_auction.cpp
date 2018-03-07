@@ -33,9 +33,10 @@
 #include <ros/time.h>
 #include <gtest/gtest.h>
 
-#include <std_msgs/Int16.h>
+#include <scrimmage_ros/RosStartAuction.h>
 #include <scrimmage_ros/RosBidAuction.h>
 
+using scrimmage_ros::RosStartAuction;
 using scrimmage_ros::RosBidAuction;
 
 class AuctionTest : public testing::Test {
@@ -56,7 +57,7 @@ class AuctionTest : public testing::Test {
     ros::Subscriber sub_bid_;
 
  public:
-    void start_auction_callback(const std_msgs::Int16::ConstPtr& msg) {
+    void start_auction_callback(const RosStartAuction::ConstPtr& msg) {
         start_hx_ct_ += 1;
     }
 
@@ -80,4 +81,3 @@ int main(int argc, char **argv) {
   ros::init(argc, argv, "auction_test");
   return RUN_ALL_TESTS();
 }
-

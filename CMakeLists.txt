@@ -56,6 +56,7 @@ add_message_files(DIRECTORY msg FILES
   Contact.msg
   ContactArray.msg
   RosBidAuction.msg
+  RosStartAuction.msg
 )
 
 ## Generate services in the 'srv' folder

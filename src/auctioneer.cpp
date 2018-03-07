@@ -31,7 +31,6 @@
  */
 
 #include <ros/ros.h>
-#include <std_msgs/Int16.h>
 
 #include <scrimmage/autonomy/Autonomy.h>
 #include <scrimmage/entity/Entity.h>
@@ -41,37 +40,38 @@
 #include <scrimmage/msgs/AuctionMsgs.pb.h>
 
 #include <scrimmage_ros/RosBidAuction.h>
+#include <scrimmage_ros/RosStartAuction.h>
 
 #if ENABLE_PYTHON_BINDINGS == 1
 #include <Python.h>
 #endif
 
 namespace sc = scrimmage;
-using BidMsg = sc::Message<auction::BidAuction>;
 using scrimmage_ros::RosBidAuction;
+using scrimmage_ros::RosStartAuction;
 
-sc::MessageBase ros2sc_start_auction(const std_msgs::Int16 &ros_msg) {
-    sc::MessageBase sc_msg;
-    // sc_msg.sender = ros_msg.data;
+sc::Message<auction::StartAuction> ros2sc_start_auction(const RosStartAuction &ros_msg) {
+    sc::Message<auction::StartAuction> sc_msg;
+    sc_msg.data.set_sender_id(ros_msg.sender_id);
     return sc_msg;
 }
 
-std_msgs::Int16 sc2ros_start_auction(const sc::MessageBasePtr &sc_msg) {
-    std_msgs::Int16 ros_msg;
-    // ros_msg.data = sc_msg->sender;
+sc::Message<auction::BidAuction> ros2sc_bid_auction(const RosBidAuction &ros_msg) {
+    sc::Message<auction::BidAuction> sc_msg;
+    sc_msg.data.set_bid(ros_msg.bid);
+    sc_msg.data.set_sender_id(ros_msg.sender_id);
+    return sc_msg;
+}
+
+RosStartAuction sc2ros_start_auction(const std::shared_ptr<sc::Message<auction::StartAuction>> &sc_msg) {
+    RosStartAuction ros_msg;
+    ros_msg.sender_id = sc_msg->data.sender_id();
     return ros_msg;
 }
 
-BidMsg ros2sc_bid_auction(const RosBidAuction &ros_msg) {
-    BidMsg sc_msg;
-    // sc_msg.sender = ros_msg.id;
-    sc_msg.data.set_bid(ros_msg.bid);
-    return sc_msg;
-}
-
-RosBidAuction sc2ros_bid_auction(const std::shared_ptr<BidMsg> &sc_msg) {
+RosBidAuction sc2ros_bid_auction(const std::shared_ptr<sc::Message<auction::BidAuction>> &sc_msg) {
     RosBidAuction ros_msg;
-    // ros_msg.id = sc_msg->sender;
+    ros_msg.sender_id = sc_msg->data.sender_id();
     ros_msg.bid = sc_msg->data.bid();
     return ros_msg;
 }
@@ -104,23 +104,22 @@ int main(int argc, char **argv) {
     external.create_entity(mission_file, max_contacts, entity_id, entity_name);
 
     ros::Publisher pub_start_auction =
-        nh.advertise<std_msgs::Int16>("StartAuction", 1000);
-
-    external.pub_cb("SphereNetwork", "StartAuction", sc2ros_start_auction,
-                    pub_start_auction);
+        nh.advertise<RosStartAuction>("StartAuction", 1000);
+    external.pub_cb<auction::StartAuction>("SphereNetwork", "StartAuction",
+                                         sc2ros_start_auction, pub_start_auction);
 
     ros::Publisher pub_bid_auction =
         nh.advertise<RosBidAuction>("BidAuction", 1000);
     external.pub_cb<auction::BidAuction>("SphereNetwork", "BidAuction",
                                          sc2ros_bid_auction, pub_bid_auction);
-    //
-    // auto subs = external.entity()->autonomies().front()->subs();
-    //
-    // ros::Subscriber sub_start_auction = nh.subscribe("StartAuction", 1000,
-    //     external.sub_cb<std_msgs::Int16>(ros2sc_start_auction, subs["StartAuction"]));
-    //
-    // ros::Subscriber sub_bid_auction = nh.subscribe("BidAuction", 1000,
-    //     external.sub_cb<RosBidAuction>(ros2sc_bid_auction, subs["BidAuction"]));
+
+    ros::Subscriber sub_start_auction = nh.subscribe("StartAuction", 1000,
+        external.sub_cb<RosStartAuction>("SphereNetwork", "StartAuction",
+                                         ros2sc_start_auction));
+
+    ros::Subscriber sub_bid_auction = nh.subscribe("BidAuction", 1000,
+        external.sub_cb<RosBidAuction>("SphereNetwork", "BidAuction",
+                                       ros2sc_bid_auction));
 
     const double loop_rate_hz = 10;
     const double startup_delay = 1;
@@ -132,12 +131,12 @@ int main(int argc, char **argv) {
         loop_rate.sleep();
     }
 
-    int ct = 0;
-    while (ros::ok() && ct < runtime * loop_rate_hz) {
+    int count = 0;
+    while (ros::ok() && count < runtime * loop_rate_hz) {
         external.step(ros::Time::now().toSec());
         loop_rate.sleep();
         ros::spinOnce();
-        ++ct;
+        ++count;
     }
 
 #if ENABLE_PYTHON_BINDINGS == 1
