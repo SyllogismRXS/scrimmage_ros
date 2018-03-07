@@ -81,12 +81,14 @@ int main(int argc, char **argv) {
     Py_Initialize();
 #endif
 
+    // Initialize the ROS node
     ros::init(argc, argv, "auctioneer");
-
     ros::NodeHandle nh;
 
+    // Get a private node handle to parse ros params
     ros::NodeHandle private_nh("~");
 
+    // Get the mission file, which holds overrides for plugin parameters
     std::string mission_file;
     private_nh.param("mission_file", mission_file, std::string(""));
 
@@ -94,9 +96,12 @@ int main(int argc, char **argv) {
     int entity_id;
     private_nh.param("entity_id", entity_id, 1);
 
+    // Get the entity name. This name should match the <name> tag in the
+    // mission file for the entity block we want to use.
     std::string entity_name;
     private_nh.param("entity_name", entity_name, std::string("UNDEFINED"));
 
+    // Specify the maximum number of contacts that we will encounter.
     int max_contacts;
     private_nh.param("max_contacts", max_contacts, 100);
 
