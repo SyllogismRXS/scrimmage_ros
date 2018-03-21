@@ -50,9 +50,9 @@ namespace sc = scrimmage;
 using scrimmage_ros::RosBidAuction;
 using scrimmage_ros::RosStartAuction;
 
-sc::Message<auction::StartAuction> ros2sc_start_auction(const RosStartAuction &ros_msg) {
-    sc::Message<auction::StartAuction> sc_msg;
-    sc_msg.data.set_sender_id(ros_msg.sender_id);
+auction::StartAuction ros2sc_start_auction(const RosStartAuction &ros_msg) {
+    auction::StartAuction sc_msg;
+    sc_msg.set_sender_id(ros_msg.sender_id);
     return sc_msg;
 }
 
