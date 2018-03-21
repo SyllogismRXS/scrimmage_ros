@@ -56,23 +56,23 @@ sc::Message<auction::StartAuction> ros2sc_start_auction(const RosStartAuction &r
     return sc_msg;
 }
 
-sc::Message<auction::BidAuction> ros2sc_bid_auction(const RosBidAuction &ros_msg) {
-    sc::Message<auction::BidAuction> sc_msg;
-    sc_msg.data.set_bid(ros_msg.bid);
-    sc_msg.data.set_sender_id(ros_msg.sender_id);
+auction::BidAuction ros2sc_bid_auction(const RosBidAuction &ros_msg) {
+    auction::BidAuction sc_msg;
+    sc_msg.set_bid(ros_msg.bid);
+    sc_msg.set_sender_id(ros_msg.sender_id);
     return sc_msg;
 }
 
-RosStartAuction sc2ros_start_auction(const std::shared_ptr<sc::Message<auction::StartAuction>> &sc_msg) {
+RosStartAuction sc2ros_start_auction(const auction::StartAuction &sc_msg) {
     RosStartAuction ros_msg;
-    ros_msg.sender_id = sc_msg->data.sender_id();
+    ros_msg.sender_id = sc_msg.sender_id();
     return ros_msg;
 }
 
-RosBidAuction sc2ros_bid_auction(const std::shared_ptr<sc::Message<auction::BidAuction>> &sc_msg) {
+RosBidAuction sc2ros_bid_auction(const auction::BidAuction &sc_msg) {
     RosBidAuction ros_msg;
-    ros_msg.sender_id = sc_msg->data.sender_id();
-    ros_msg.bid = sc_msg->data.bid();
+    ros_msg.sender_id = sc_msg.sender_id();
+    ros_msg.bid = sc_msg.bid();
     return ros_msg;
 }
 
