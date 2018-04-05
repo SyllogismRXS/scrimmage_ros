@@ -106,7 +106,8 @@ int main(int argc, char **argv) {
     private_nh.param("max_contacts", max_contacts, 100);
 
     sc::External external;
-    external.create_entity(mission_file, max_contacts, entity_id, entity_name);
+    // if (!external.mp()->parse(mission_file)) return false;
+    external.create_entity(max_contacts, entity_id, entity_name);
 
     ros::Publisher pub_start_auction =
         nh.advertise<RosStartAuction>("StartAuction", 1000);

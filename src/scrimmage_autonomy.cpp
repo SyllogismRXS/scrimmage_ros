@@ -111,6 +111,7 @@ bool ScrimmageAutonomy::init_scrimmage()
     info["autonomy0"] = autonomy_plugin;
     //info["controller0"] = "JSBSimModelControllerHeadingPID";
 
+    if (!external.mp()->parse(mission_file)) return false;
     if (external_.create_entity(100, id_, info, "~/.scrimmage/logs/ros")) {
         //contacts_ = std::make_shared<sc::ContactMap>();
         update_contacts();

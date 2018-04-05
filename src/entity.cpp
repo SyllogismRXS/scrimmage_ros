@@ -4,20 +4,21 @@
 #include <boost/regex.hpp>
 #include <Eigen/Dense>
 
+#include <scrimmage/autonomy/Autonomy.h>
 #include <scrimmage/common/RTree.h>
 #include <scrimmage/common/Random.h>
 #include <scrimmage/common/Time.h>
-#include <scrimmage/autonomy/Autonomy.h>
+#include <scrimmage/entity/Entity.h>
+#include <scrimmage/log/Log.h>
+#include <scrimmage/math/State.h>
 #include <scrimmage/motion/Controller.h>
+#include <scrimmage/parse/ParseUtils.h>
+#include <scrimmage/parse/MissionParse.h>
+#include <scrimmage/parse/ConfigParse.h>
+#include <scrimmage/plugin_manager/PluginManager.h>
 #include <scrimmage/pubsub/PubSub.h>
 #include <scrimmage/pubsub/Network.h>
 #include <scrimmage/pubsub/SubscriberBase.h>
-#include <scrimmage/math/State.h>
-#include <scrimmage/parse/ParseUtils.h>
-#include <scrimmage/parse/ConfigParse.h>
-#include <scrimmage/log/Log.h>
-#include <scrimmage/entity/Entity.h>
-#include <scrimmage/plugin_manager/PluginManager.h>
 
 #include "ros/ros.h"
 #include <tf/tf.h>
@@ -63,7 +64,8 @@ bool Entity::init(int argc, char *argv[], std::string node_name){
     int max_contacts;
     private_nh.param("max_contacts", max_contacts, 100);
 
-    external_.create_entity(mission_file, max_contacts, entity_id, entity_name);
+    if (!external_.mp()->parse(mission_file)) return false;
+    external_.create_entity(max_contacts, entity_id, entity_name);
 
     // std::string network_name = "GlobalNetwork";
     // std::string sc_topic_name = "ANumber";
