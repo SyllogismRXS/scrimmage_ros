@@ -57,11 +57,11 @@ class AuctionTest : public testing::Test {
     ros::Subscriber sub_bid_;
 
  public:
-    void start_auction_callback(const RosStartAuction::ConstPtr& msg) {
+    void start_auction_callback(const RosStartAuction::ConstPtr &/*msg*/) {
         start_hx_ct_ += 1;
     }
 
-    void bid_auction_callback(const RosBidAuction::ConstPtr &msg) {
+    void bid_auction_callback(const RosBidAuction::ConstPtr &/*msg*/) {
         bid_hx_ct_ += 1;
     }
 };
@@ -79,5 +79,6 @@ TEST_F(AuctionTest, msg) {
 int main(int argc, char **argv) {
   ::testing::InitGoogleTest(&argc, argv);
   ros::init(argc, argv, "auction_test");
+  ros::start();
   return RUN_ALL_TESTS();
 }

@@ -1,6 +1,14 @@
 cmake_minimum_required(VERSION 2.8.3)
 project(scrimmage_ros)
 
+# see : https://crascit.com/2016/04/09/using-ccache-with-cmake/
+find_program(CCACHE_PROGRAM ccache)
+if(CCACHE_PROGRAM)
+  set_property(GLOBAL PROPERTY RULE_LAUNCH_COMPILE "${CCACHE_PROGRAM}")
+else()
+  message("ccache not found, repeated builds will be faster if this program is installed")
+endif()
+
 ## Add support for C++11, supported in ROS Kinetic and newer
 # add_definitions(-std=c++11)
 
@@ -158,10 +166,10 @@ include_directories(
 ###############################################################################
 set(CMAKE_CXX_STANDARD 14)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra")
 
-set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -Wall") # -fprofile-arcs -ftest-coverage")
-set(CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG} -Wall") # -fprofile-arcs -ftest-coverage")
+set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -Wall -Wextra") # -fprofile-arcs -ftest-coverage")
+set(CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG} -Wall -Wextra") # -fprofile-arcs -ftest-coverage")
 
 option(ADD_HOME_LOCAL_PREFIX "Add ~/.local to cmake prefix" OFF)
 if(ADD_HOME_LOCAL_PREFIX)
@@ -251,11 +259,11 @@ add_dependencies(entity scrimmage_ros_generate_messages_cpp)
 # )
 
 ## Mark other files for installation (e.g. launch and bag files, etc.)
-# install(FILES
-#   # myfile1
-#   # myfile2
-#   DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}
-# )
+install(FILES
+  test/test_auction.launch
+  # myfile2
+  DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}
+)
 
 #############
 ## Testing ##
@@ -269,6 +277,9 @@ add_dependencies(entity scrimmage_ros_generate_messages_cpp)
 
 ## Add folders to be run by python nosetests
 # catkin_add_nosetests(test)
-find_package(rostest REQUIRED)
-add_rostest_gtest(test_auction test/test_auction.launch test/test_auction.cpp)
-target_link_libraries(test_auction ${catkin_LIBRARIES} ${SCRIMMAGE_LIBRARIES} gtest_main)
+if(CATKIN_ENABLE_TESTING)
+    find_package(rostest REQUIRED)
+
+    add_rostest_gtest(test_auction test/test_auction.launch test/test_auction.cpp)
+    target_link_libraries(test_auction ${catkin_LIBRARIES} ${SCRIMMAGE_LIBRARIES} gtest_main)
+endif() 

@@ -35,6 +35,7 @@
 #include <scrimmage/autonomy/Autonomy.h>
 #include <scrimmage/entity/Entity.h>
 #include <scrimmage/entity/External.h>
+#include <scrimmage/parse/MissionParse.h>
 #include <scrimmage/pubsub/Message.h>
 #include <scrimmage/pubsub/PubSub.h>
 #include <scrimmage/msgs/AuctionMsgs.pb.h>
@@ -106,25 +107,27 @@ int main(int argc, char **argv) {
     private_nh.param("max_contacts", max_contacts, 100);
 
     sc::External external;
-    // if (!external.mp()->parse(mission_file)) return false;
+    if (!external.mp()->parse(mission_file)) return 1;
     external.create_entity(max_contacts, entity_id, entity_name);
+
+    const std::string network_name = "CommsNetwork";
 
     ros::Publisher pub_start_auction =
         nh.advertise<RosStartAuction>("StartAuction", 1000);
-    external.pub_cb<auction::StartAuction>("SphereNetwork", "StartAuction",
+    external.pub_cb<auction::StartAuction>(network_name, "StartAuction",
                                          sc2ros_start_auction, pub_start_auction);
 
     ros::Publisher pub_bid_auction =
         nh.advertise<RosBidAuction>("BidAuction", 1000);
-    external.pub_cb<auction::BidAuction>("SphereNetwork", "BidAuction",
+    external.pub_cb<auction::BidAuction>(network_name, "BidAuction",
                                          sc2ros_bid_auction, pub_bid_auction);
 
     ros::Subscriber sub_start_auction = nh.subscribe("StartAuction", 1000,
-        external.sub_cb<RosStartAuction>("SphereNetwork", "StartAuction",
+        external.sub_cb<RosStartAuction>(network_name, "StartAuction",
                                          ros2sc_start_auction));
 
     ros::Subscriber sub_bid_auction = nh.subscribe("BidAuction", 1000,
-        external.sub_cb<RosBidAuction>("SphereNetwork", "BidAuction",
+        external.sub_cb<RosBidAuction>(network_name, "BidAuction",
                                        ros2sc_bid_auction));
 
     const double loop_rate_hz = 10;
@@ -138,11 +141,10 @@ int main(int argc, char **argv) {
     }
 
     int count = 0;
-    while (ros::ok() && count < runtime * loop_rate_hz) {
+    while (ros::ok() && count++ < runtime * loop_rate_hz) {
         external.step(ros::Time::now().toSec());
         loop_rate.sleep();
         ros::spinOnce();
-        ++count;
     }
 
 #if ENABLE_PYTHON_BINDINGS == 1
