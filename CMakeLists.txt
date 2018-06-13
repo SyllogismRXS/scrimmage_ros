@@ -223,11 +223,17 @@ include_directories(${EIGEN3_INCLUDE_DIR})
 
 # the auction node
 add_executable(auctioneer src/auctioneer.cpp)
-target_link_libraries(auctioneer ${catkin_LIBRARIES} ${SCRIMMAGE_LIBRARIES})
+target_link_libraries(auctioneer
+  ${catkin_LIBRARIES}
+  scrimmage-core
+  scrimmage-python)
 add_dependencies(auctioneer scrimmage_ros_generate_messages_cpp)
 
 add_executable(entity src/entity.cpp)
-target_link_libraries(entity ${catkin_LIBRARIES} ${SCRIMMAGE_LIBRARIES})
+target_link_libraries(entity
+  ${catkin_LIBRARIES}
+  scrimmage-core
+  scrimmage-python)
 add_dependencies(entity scrimmage_ros_generate_messages_cpp)
 
 #############
@@ -281,5 +287,5 @@ if(CATKIN_ENABLE_TESTING)
     find_package(rostest REQUIRED)
 
     add_rostest_gtest(test_auction test/test_auction.launch test/test_auction.cpp)
-    target_link_libraries(test_auction ${catkin_LIBRARIES} ${SCRIMMAGE_LIBRARIES} gtest_main)
+    target_link_libraries(test_auction ${catkin_LIBRARIES} scrimmage-core scrimmage-python gtest_main)
 endif() 
