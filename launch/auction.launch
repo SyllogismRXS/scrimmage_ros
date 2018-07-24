@@ -7,6 +7,7 @@
         name="entity_1"
         type="auctioneer"
         output="screen">
+    <param name="wrap_all" value="true" type="bool"/>
     <param name="mission_file" value="$(arg mission_file)" type="str"/>
     <param name="max_contacts" value="$(arg max_contacts)" type="int"/>
     <param name="entity_name" value="agent" type="str"/>

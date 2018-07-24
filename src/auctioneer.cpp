@@ -112,23 +112,39 @@ int main(int argc, char **argv) {
 
     const std::string network_name = "CommsNetwork";
 
-    ros::Publisher pub_start_auction =
-        nh.advertise<RosStartAuction>("StartAuction", 1000);
-    external.pub_cb<auction::StartAuction>(network_name, "StartAuction",
-                                         sc2ros_start_auction, pub_start_auction);
+    bool wrap_all;
+    private_nh.param("wrap_all", wrap_all, true);
+    std::cout << "wrap_all = " << wrap_all << std::endl;
 
-    ros::Publisher pub_bid_auction =
-        nh.advertise<RosBidAuction>("BidAuction", 1000);
-    external.pub_cb<auction::BidAuction>(network_name, "BidAuction",
-                                         sc2ros_bid_auction, pub_bid_auction);
+    ros::Publisher pub_start_auction;
+    ros::Publisher pub_bid_auction;
+    ros::Publisher pub_result_auction;
 
-    ros::Subscriber sub_start_auction = nh.subscribe("StartAuction", 1000,
-        external.sub_cb<RosStartAuction>(network_name, "StartAuction",
-                                         ros2sc_start_auction));
+    ros::Subscriber sub_start_auction;
+    ros::Subscriber sub_bid_auction;
 
-    ros::Subscriber sub_bid_auction = nh.subscribe("BidAuction", 1000,
-        external.sub_cb<RosBidAuction>(network_name, "BidAuction",
-                                       ros2sc_bid_auction));
+    if (wrap_all) {
+        pub_start_auction = nh.advertise<RosStartAuction>("StartAuction", 1000);
+        external.pub_cb<auction::StartAuction>(
+            network_name, "StartAuction", sc2ros_start_auction, pub_start_auction);
+
+        pub_bid_auction = nh.advertise<RosBidAuction>("BidAuction", 1000);
+        external.pub_cb<auction::BidAuction>(
+            network_name, "BidAuction", sc2ros_bid_auction, pub_bid_auction);
+
+        sub_start_auction = nh.subscribe("StartAuction", 1000,
+            external.sub_cb<RosStartAuction>(
+                network_name, "StartAuction", ros2sc_start_auction));
+
+        sub_bid_auction = nh.subscribe("BidAuction", 1000,
+            external.sub_cb<RosBidAuction>(
+                network_name, "BidAuction", ros2sc_bid_auction));
+    }
+
+    pub_result_auction = nh.advertise<RosBidAuction>("ResultAuction", 1000);
+    external.pub_cb<auction::BidAuction>(
+        network_name, "ResultAuction", sc2ros_bid_auction, pub_result_auction);
+
 
     const double loop_rate_hz = 10;
     const double startup_delay = 1;

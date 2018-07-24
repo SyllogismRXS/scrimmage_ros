@@ -9,6 +9,7 @@
         output="screen">
 
     <param name="mission_file" value="$(arg mission_file)" type="str"/>
+    <param name="wrap_all" value="true" type="bool"/>
     <param name="max_contacts" value="$(arg max_contacts)" type="int"/>
     <param name="entity_name" value="agent" type="str"/>
     <param name="entity_id" value="1" type="int"/>    
@@ -19,14 +20,19 @@
         type="auctioneer"
         output="screen">
     <param name="mission_file" value="$(arg mission_file)" type="str"/>
+    <param name="wrap_all" value="true" type="bool"/>
     <param name="max_contacts" value="$(arg max_contacts)" type="int"/>
     <param name="entity_name" value="agent" type="str"/>
     <param name="entity_id" value="2" type="int"/>    
   </node>
   
   <test
-    test-name="test_auction"
+    test-name="test_auction2"
     pkg="scrimmage_ros"
-    type="test_auction" />
+    type="test_auction">
+
+    <param name="num_bids" value="2" type="int"/>
+    <param name="num_starts" value="1" type="int"/>
+  </test>
 
 </launch> 

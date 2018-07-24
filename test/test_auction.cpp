@@ -42,6 +42,7 @@ using scrimmage_ros::RosBidAuction;
 class AuctionTest : public testing::Test {
  protected:
     virtual void SetUp() {
+        ros::NodeHandle private_nh("~");
         ros::NodeHandle nh_;
         sub_start_ =
           nh_.subscribe("StartAuction", 20,
@@ -49,10 +50,23 @@ class AuctionTest : public testing::Test {
         sub_bid_ =
           nh_.subscribe("BidAuction", 20,
                 &AuctionTest::bid_auction_callback, this);
+
+        sub_result_ =
+          nh_.subscribe("ResultAuction", 20,
+                &AuctionTest::result_auction_callback, this);
+
+        private_nh.param("num_bids", num_bids_, 5000);
+        private_nh.param("num_starts", num_starts_, 5000);
     }
+
+    int num_bids_ = 5000;
+    int num_starts_ = 5000;
 
     int start_hx_ct_ = 0;
     int bid_hx_ct_ = 0;
+    int winner_id_ = -1;
+
+    ros::Subscriber sub_result_;
     ros::Subscriber sub_start_;
     ros::Subscriber sub_bid_;
 
@@ -64,6 +78,10 @@ class AuctionTest : public testing::Test {
     void bid_auction_callback(const RosBidAuction::ConstPtr &/*msg*/) {
         bid_hx_ct_ += 1;
     }
+
+    void result_auction_callback(const RosBidAuction::ConstPtr &msg) {
+        winner_id_ = msg->sender_id;
+    }
 };
 
 TEST_F(AuctionTest, msg) {
@@ -72,13 +90,13 @@ TEST_F(AuctionTest, msg) {
     loop_rate.sleep();
     ros::spinOnce();
 
-    EXPECT_EQ(bid_hx_ct_, 2);
-    EXPECT_EQ(start_hx_ct_, 1);
+    EXPECT_EQ(bid_hx_ct_, num_bids_);
+    EXPECT_EQ(start_hx_ct_, num_starts_);
 }
 
 int main(int argc, char **argv) {
-  ::testing::InitGoogleTest(&argc, argv);
-  ros::init(argc, argv, "auction_test");
-  ros::start();
-  return RUN_ALL_TESTS();
+    ::testing::InitGoogleTest(&argc, argv);
+    ros::init(argc, argv, "auction_test");
+    ros::start();
+    return RUN_ALL_TESTS();
 }

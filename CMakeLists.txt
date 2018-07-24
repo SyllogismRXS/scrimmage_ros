@@ -267,6 +267,7 @@ add_dependencies(entity scrimmage_ros_generate_messages_cpp)
 ## Mark other files for installation (e.g. launch and bag files, etc.)
 install(FILES
   test/test_auction.launch
+  test/test_auction2.launch
   # myfile2
   DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}
 )
@@ -288,4 +289,7 @@ if(CATKIN_ENABLE_TESTING)
 
     add_rostest_gtest(test_auction test/test_auction.launch test/test_auction.cpp)
     target_link_libraries(test_auction ${catkin_LIBRARIES} scrimmage-core scrimmage-python gtest_main)
+
+    add_rostest_gtest(test_auction2 test/test_auction2.launch test/test_auction.cpp)
+    target_link_libraries(test_auction2 ${catkin_LIBRARIES} scrimmage-core scrimmage-python gtest_main)
 endif() 
