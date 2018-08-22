@@ -26,7 +26,12 @@ You will need to build the SCRIMMAGE simulator
 
         $ cd ~/catkin_ws
         $ catkin_make
-        
+
+## Install ROS 2D Navigation Stack Dependencies
+
+    $ sudo apt-get install ros-kinetic-nav2d ros-kinetic-rviz \
+        ros-kinetic-map-server ros-kinetic-move-base ros-kinetic-global-planner
+
 ## Run Example
 
 The example SCRIMMAGE mission / roslaunch simulates two ground robots running
@@ -55,7 +60,7 @@ may be automated in the future, but it's manual configuration for now.
 
 You need to specify the same map file in both multiple-robots.launch
 (name="map\_name" default="simple-maze-1") and the ros-ex1.xml scrimmage
-mission file (e.g., entity_interaction order="0" map="simple-maze-1").
+mission file (e.g., entity_interaction map="simple-maze-1").
 
 ### Robot Transforms
 
