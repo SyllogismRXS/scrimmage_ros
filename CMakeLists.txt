@@ -131,11 +131,6 @@ include_directories(
   ${catkin_INCLUDE_DIRS}
 )
 
-## Declare a C++ library
-# add_library(${PROJECT_NAME}
-#   src/${PROJECT_NAME}/scrimmage_ros.cpp
-# )
-
 ## Add cmake target dependencies of the library
 ## as an example, code may need to be generated before libraries
 ## either from message generation or dynamic reconfigure
@@ -221,6 +216,14 @@ include_directories(${EIGEN3_INCLUDE_DIR})
 # target_link_libraries(scrimmage_autonomy_node ${catkin_LIBRARIES} ${SCRIMMAGE_LIBRARIES})
 # add_dependencies(scrimmage_autonomy_node ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 
+# Declare a C++ library
+add_library(scrimmage_nodelet
+  ./src/nodelet.cpp
+  )
+target_link_libraries(scrimmage_nodelet
+  scrimmage-core
+  )
+
 # the auction node
 add_executable(auctioneer src/auctioneer.cpp)
 target_link_libraries(auctioneer
@@ -292,4 +295,4 @@ if(CATKIN_ENABLE_TESTING)
 
     add_rostest_gtest(test_auction2 test/test_auction2.launch test/test_auction.cpp)
     target_link_libraries(test_auction2 ${catkin_LIBRARIES} scrimmage-core scrimmage-python gtest_main)
-endif() 
+endif()

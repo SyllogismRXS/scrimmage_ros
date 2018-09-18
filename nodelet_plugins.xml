@@ -1,0 +1,8 @@
+<library path="lib/libscrimmage_nodelet">
+  <class name="scrimmage_ros/Nodelet" type="scrimmage_ros::Nodelet" base_class_type="nodelet::Nodelet">
+  <description>
+	The scrimmage_ros/Nodelet nodelet loads and runs SCRIMMAGE plugins.
+  </description>
+  </class>
+</library>
+
