@@ -31,13 +31,13 @@
  */
 
 #include <scrimmage_ros/nodelet.h>
+#include "ros/console.h"
 
 #include <scrimmage/autonomy/Autonomy.h>
 #include <scrimmage/motion/MotionModel.h>
 #include <scrimmage/common/Algorithm.h>
 #include <scrimmage/sensor/Sensor.h>
 #include <scrimmage/pubsub/Message.h>
-#include <scrimmage/common/FileSearch.h>
 #include <scrimmage/common/Utilities.h>
 #include <scrimmage/parse/MissionParse.h>
 
@@ -77,6 +77,11 @@ void Nodelet::onInit() {
         NODELET_ERROR_STREAM(this->getName() << "missing ros param: entity_name.");
     }
 
+    std::string plugin_tags_str;
+    if (not private_nh.getParam("tags", plugin_tags_str)) {
+        NODELET_ERROR_STREAM(this->getName() << "missing ros param: plugin_tags.");
+    }
+
     if (not private_nh.getParam("entity_id", entity_id_)) {
         NODELET_WARN_STREAM(this->getName() << "missing ros param: entity_id.");
     }
@@ -84,17 +89,6 @@ void Nodelet::onInit() {
     int max_contacts = 100;
     if (not private_nh.getParam("max_contacts", max_contacts)) {
         NODELET_WARN_STREAM(this->getName() << "missing ros param: max_contacts.");
-    }
-
-    // Search for the mission file
-    auto found_mission_file = sc::FileSearch().find_mission(mission_file);
-    if(not found_mission_file) {
-        NODELET_ERROR_STREAM(this->getName() << " failed to load mission file: " << mission_file);
-    }
-
-    // Parse the mission file;
-    if (not external_.mp()->parse(*found_mission_file)) {
-        NODELET_ERROR_STREAM(this->getName() << " failed to parse mission file: " << mission_file);
     }
 
     // Call init() for subclasses
@@ -108,20 +102,15 @@ void Nodelet::onInit() {
     if (not fs::exists(fs::path(ros_log_dir_))) {
         NODELET_ERROR_STREAM("ROS log directory doesn't exist: " << ros_log_dir_);
     }
-    external_.setup_logging(ros_log_dir_ + "/scrimmage");
 
-    const bool create_entity = external_.create_entity(max_contacts, entity_id_, entity_name, false);
+    const bool create_entity =
+        external_.create_entity(mission_file, entity_name, plugin_tags_str,
+                                entity_id_, max_contacts,
+                                ros_log_dir_ + "/scrimmage");
     if (create_entity) {
-        for (auto &kv : external_.entity()->sensors()) {
-            NODELET_INFO_STREAM(this->getName() << " loaded sensor plugin: " << kv.second->name());
-        }
-        for (sc::AutonomyPtr a : external_.entity()->autonomies()) {
-            NODELET_INFO_STREAM(this->getName() << " loaded autonomy plugin: " << a->name());
-        }
-        for (sc::ControllerPtr c : external_.entity()->controllers()) {
-            NODELET_INFO_STREAM(this->getName() << " loaded controller plugin: " << c->name());
-        }
-        NODELET_INFO_STREAM(this->getName() << " loaded motion plugin: " << external_.entity()->motion()->name());
+        std::ostringstream buf;
+        external_.print_plugins(buf);
+        NODELET_INFO_STREAM(buf.str());
     } else {
         NODELET_ERROR_STREAM(this->getName() << "failed to load plugins for " << entity_name);
     }

@@ -232,13 +232,6 @@ target_link_libraries(auctioneer
   scrimmage-python)
 add_dependencies(auctioneer scrimmage_ros_generate_messages_cpp)
 
-add_executable(entity src/entity.cpp)
-target_link_libraries(entity
-  ${catkin_LIBRARIES}
-  scrimmage-core
-  scrimmage-python)
-add_dependencies(entity scrimmage_ros_generate_messages_cpp)
-
 #############
 ## Install ##
 #############

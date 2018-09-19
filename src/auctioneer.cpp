@@ -108,7 +108,8 @@ int main(int argc, char **argv) {
 
     sc::External external;
     if (!external.mp()->parse(mission_file)) return 1;
-    external.create_entity(max_contacts, entity_id, entity_name);
+    external.create_entity(mission_file, entity_name, "", entity_id,
+                           max_contacts, "");
 
     const std::string network_name = "CommsNetwork";
 
