@@ -33,6 +33,7 @@
 #include <scrimmage_ros/nodelet.h>
 
 #include <scrimmage/autonomy/Autonomy.h>
+#include <scrimmage/motion/MotionModel.h>
 #include <scrimmage/common/Algorithm.h>
 #include <scrimmage/sensor/Sensor.h>
 #include <scrimmage/pubsub/Message.h>
@@ -120,6 +121,7 @@ void Nodelet::onInit() {
         for (sc::ControllerPtr c : external_.entity()->controllers()) {
             NODELET_INFO_STREAM(this->getName() << " loaded controller plugin: " << c->name());
         }
+        NODELET_INFO_STREAM(this->getName() << " loaded motion plugin: " << external_.entity()->motion()->name());
     } else {
         NODELET_ERROR_STREAM(this->getName() << "failed to load plugins for " << entity_name);
     }
@@ -130,6 +132,9 @@ void Nodelet::onInit() {
 }
 void Nodelet::timer_cb(const ros::TimerEvent& event) {
     NODELET_INFO_STREAM("The time is now " << event.current_real);
+
+    external_.step(ros::Time::now().toSec());
+
     if (!step()) {
         NODELET_ERROR_STREAM("step() call failed in " << this->getName());
     }
