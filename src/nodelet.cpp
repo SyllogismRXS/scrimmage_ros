@@ -41,6 +41,9 @@
 #include <scrimmage/common/Utilities.h>
 #include <scrimmage/parse/MissionParse.h>
 
+#include <XmlRpcValue.h>
+#include <time.h>
+
 #define BOOST_NO_CXX11_SCOPED_ENUMS
 #include <boost/filesystem.hpp>
 #undef BOOST_NO_CXX11_SCOPED_ENUMS
@@ -96,6 +99,41 @@ void Nodelet::onInit() {
         NODELET_ERROR_STREAM("init() call failed in " << this->getName());
     }
 
+    auto param_override_func = [&](std::map<std::string, std::string>& param_map) {
+        for (auto &kv : param_map) {
+            std::string resolved_param;
+            if (private_nh.searchParam(kv.first, resolved_param)) {
+                XmlRpc::XmlRpcValue xmlrpc;
+                if (private_nh.getParam(resolved_param, xmlrpc)) {
+                    if (xmlrpc.getType() == XmlRpc::XmlRpcValue::Type::TypeInvalid) {
+                        NODELET_WARN_STREAM("Invalid XmlRpc param: " << resolved_param);
+                    } else if (xmlrpc.getType() == XmlRpc::XmlRpcValue::Type::TypeBoolean) {
+                        kv.second = std::to_string(bool(xmlrpc));
+                    } else if (xmlrpc.getType() == XmlRpc::XmlRpcValue::Type::TypeInt) {
+                        kv.second = std::to_string(int(xmlrpc));
+                    } else if (xmlrpc.getType() == XmlRpc::XmlRpcValue::Type::TypeDouble) {
+                        kv.second = std::to_string(double(xmlrpc));
+                    } else if (xmlrpc.getType() == XmlRpc::XmlRpcValue::Type::TypeString) {
+                        kv.second = std::string(xmlrpc);
+                    } else if (xmlrpc.getType() == XmlRpc::XmlRpcValue::Type::TypeDateTime) {
+                        struct tm time = tm(xmlrpc);
+                        kv.second = std::to_string(timegm(&time));
+                    } else if (xmlrpc.getType() == XmlRpc::XmlRpcValue::Type::TypeBase64) {
+                        NODELET_INFO_STREAM("Unsupported XmlRpc type (TypeBase64): " << resolved_param);
+                    } else if (xmlrpc.getType() == XmlRpc::XmlRpcValue::Type::TypeArray) {
+                        NODELET_INFO_STREAM("Unsupported XmlRpc type (TypeArray): " << resolved_param);
+                    } else if (xmlrpc.getType() == XmlRpc::XmlRpcValue::Type::TypeStruct) {
+                        NODELET_INFO_STREAM("Unsupported XmlRpc type (TypeSTruct): " << resolved_param);
+                    } else {
+                        NODELET_WARN_STREAM("Can't parse XmlRpc param: " << resolved_param);
+                    }
+                } else {
+                    NODELET_WARN_STREAM("Failed to retrieve XMLRpc value for: " << resolved_param);
+                }
+            }
+        }
+    };
+
     // Get the current ROS log directory
     ros_log_dir_ = sc::exec_command("roslaunch-logs");
     ros_log_dir_.erase(std::remove(ros_log_dir_.begin(), ros_log_dir_.end(), '\n'), ros_log_dir_.end());
@@ -106,7 +144,8 @@ void Nodelet::onInit() {
     const bool create_entity =
         external_.create_entity(mission_file, entity_name, plugin_tags_str,
                                 entity_id_, max_contacts,
-                                ros_log_dir_ + "/scrimmage");
+                                ros_log_dir_ + "/scrimmage",
+                                param_override_func);
     if (create_entity) {
         std::ostringstream buf;
         external_.print_plugins(buf);

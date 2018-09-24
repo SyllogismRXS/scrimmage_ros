@@ -3,7 +3,7 @@
   <arg name="entity_name" default="uuv_entity"/>
   <arg name="entity_id" default="1"/>
   <arg name="max_contacts" default="100"/>
-  <arg name="scrimmage_plugin_tags" default="REAL"/>
+  <arg name="scrimmage_plugin_tags" default="REAL SIL"/>
 
   <node pkg="nodelet" type="nodelet" name="standalone_nodelet"  args="manager" output="screen"/>
   <node pkg="nodelet" type="nodelet" name="scrimmage_nodelet" args="load scrimmage_ros/Nodelet standalone_nodelet" output="screen">
@@ -12,6 +12,6 @@
     <param name="tags" type="string" value="$(arg scrimmage_plugin_tags)"/>
     <param name="entity_id" value="$(arg entity_id)" type="int"/>
     <param name="max_contacts" value="$(arg max_contacts)" type="int"/>
-    <param name="loop_rate_hz" type="double" value="1"/>    
+    <param name="loop_rate_hz" type="double" value="1"/>
   </node>
 </launch>
