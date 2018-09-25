@@ -16,6 +16,7 @@ public:
     const double & loop_rate_hz();
     bool step(const double &t, std::ostream &out = std::cout);
     static std::string exec_command(const char* cmd);
+    scrimmage::External &external() { return external_; }
 protected:
     ros::NodeHandle nh_;
     ros::NodeHandle private_nh_;

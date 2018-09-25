@@ -42,6 +42,7 @@
 
 #include <scrimmage_ros/RosBidAuction.h>
 #include <scrimmage_ros/RosStartAuction.h>
+#include <scrimmage_ros/scrimmage_ros.h>
 
 #if ENABLE_PYTHON_BINDINGS == 1
 #include <Python.h>
@@ -89,33 +90,10 @@ int main(int argc, char **argv) {
     // Get a private node handle to parse ros params
     ros::NodeHandle private_nh("~");
 
-    // Get the mission file, which holds overrides for plugin parameters
-    std::string mission_file;
-    private_nh.param("mission_file", mission_file, std::string(""));
-
-    // Get the entity ID
-    int entity_id;
-    private_nh.param("entity_id", entity_id, 1);
-
-    // Get the entity name. This name should match the <name> tag in the
-    // mission file for the entity block we want to use.
-    std::string entity_name;
-    private_nh.param("entity_name", entity_name, std::string("UNDEFINED"));
-
-    // Specify the maximum number of contacts that we will encounter.
-    int max_contacts;
-    private_nh.param("max_contacts", max_contacts, 100);
-
-    sc::External external;
-    if (!external.mp()->parse(mission_file)) return 1;
-    external.create_entity(mission_file, entity_name, "", entity_id,
-                           max_contacts, "");
-
-    const std::string network_name = "CommsNetwork";
-
-    bool wrap_all;
-    private_nh.param("wrap_all", wrap_all, true);
-    std::cout << "wrap_all = " << wrap_all << std::endl;
+    scrimmage_ros::scrimmage_ros sc_ros(nh, private_nh, ros::this_node::getName());
+    std::ostringstream buf;
+    sc_ros.init(buf);
+    ROS_INFO_STREAM(buf.str());
 
     ros::Publisher pub_start_auction;
     ros::Publisher pub_bid_auction;
@@ -124,42 +102,40 @@ int main(int argc, char **argv) {
     ros::Subscriber sub_start_auction;
     ros::Subscriber sub_bid_auction;
 
-    if (wrap_all) {
-        pub_start_auction = nh.advertise<RosStartAuction>("StartAuction", 1000);
-        external.pub_cb<auction::StartAuction>(
-            network_name, "StartAuction", sc2ros_start_auction, pub_start_auction);
+    const std::string network_name = "CommsNetwork";
 
-        pub_bid_auction = nh.advertise<RosBidAuction>("BidAuction", 1000);
-        external.pub_cb<auction::BidAuction>(
-            network_name, "BidAuction", sc2ros_bid_auction, pub_bid_auction);
+    pub_start_auction = nh.advertise<RosStartAuction>("StartAuction", 1000);
+    sc_ros.external().pub_cb<auction::StartAuction>(
+        network_name, "StartAuction", sc2ros_start_auction, pub_start_auction);
 
-        sub_start_auction = nh.subscribe("StartAuction", 1000,
-            external.sub_cb<RosStartAuction>(
-                network_name, "StartAuction", ros2sc_start_auction));
+    pub_bid_auction = nh.advertise<RosBidAuction>("BidAuction", 1000);
+    sc_ros.external().pub_cb<auction::BidAuction>(
+        network_name, "BidAuction", sc2ros_bid_auction, pub_bid_auction);
 
-        sub_bid_auction = nh.subscribe("BidAuction", 1000,
-            external.sub_cb<RosBidAuction>(
-                network_name, "BidAuction", ros2sc_bid_auction));
-    }
+    sub_start_auction = nh.subscribe("StartAuction", 1000,
+                                     sc_ros.external().sub_cb<RosStartAuction>(
+                                         network_name, "StartAuction", ros2sc_start_auction));
+
+    sub_bid_auction = nh.subscribe("BidAuction", 1000,
+                                   sc_ros.external().sub_cb<RosBidAuction>(
+                                       network_name, "BidAuction", ros2sc_bid_auction));
 
     pub_result_auction = nh.advertise<RosBidAuction>("ResultAuction", 1000);
-    external.pub_cb<auction::BidAuction>(
+    sc_ros.external().pub_cb<auction::BidAuction>(
         network_name, "ResultAuction", sc2ros_bid_auction, pub_result_auction);
 
-
-    const double loop_rate_hz = 10;
     const double startup_delay = 1;
     const double runtime = 10;
-    ros::Rate loop_rate(loop_rate_hz);
+    ros::Rate loop_rate(sc_ros.loop_rate_hz());
 
     // wait for all nodes to startup
-    for (int i = 0; i < startup_delay * loop_rate_hz; i++) {
+    for (int i = 0; i < startup_delay * sc_ros.loop_rate_hz(); i++) {
         loop_rate.sleep();
     }
 
     int count = 0;
-    while (ros::ok() && count++ < runtime * loop_rate_hz) {
-        external.step(ros::Time::now().toSec());
+    while (ros::ok() && count++ < runtime * sc_ros.loop_rate_hz()) {
+        sc_ros.external().step(ros::Time::now().toSec());
         loop_rate.sleep();
         ros::spinOnce();
     }

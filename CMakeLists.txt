@@ -238,7 +238,9 @@ add_executable(auctioneer src/auctioneer.cpp)
 target_link_libraries(auctioneer
   ${catkin_LIBRARIES}
   scrimmage-core
-  scrimmage-python)
+  scrimmage-python
+  scrimmage_ros
+  )
 add_dependencies(auctioneer scrimmage_ros_generate_messages_cpp)
 
 #############
@@ -292,9 +294,26 @@ install(FILES
 if(CATKIN_ENABLE_TESTING)
     find_package(rostest REQUIRED)
 
-    add_rostest_gtest(test_auction test/test_auction.launch test/test_auction.cpp)
-    target_link_libraries(test_auction ${catkin_LIBRARIES} scrimmage-core scrimmage-python gtest_main)
+    add_rostest_gtest(test_auction
+      test/test_auction.launch
+      test/test_auction.cpp
+      )
+    target_link_libraries(test_auction
+      ${catkin_LIBRARIES}
+      scrimmage-core
+      scrimmage-python
+      scrimmage_ros
+      gtest_main
+      )
 
-    add_rostest_gtest(test_auction2 test/test_auction2.launch test/test_auction.cpp)
-    target_link_libraries(test_auction2 ${catkin_LIBRARIES} scrimmage-core scrimmage-python gtest_main)
+    add_rostest_gtest(test_auction2
+      test/test_auction2.launch
+      test/test_auction.cpp
+      )
+    target_link_libraries(test_auction2
+      ${catkin_LIBRARIES}
+      scrimmage-core
+      scrimmage-python
+      scrimmage_ros
+      gtest_main)
 endif()

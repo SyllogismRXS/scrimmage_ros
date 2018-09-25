@@ -1,17 +1,20 @@
 <launch>
 
-  <arg name="mission_file" default="~/scrimmage/scrimmage/missions/auction_assign.xml"/>  
+  <arg name="mission_file" default="auction_assign"/>
+  <arg name="entity_tag" default="uuv_entity"/>  
   <arg name="max_contacts" default="100"/>
-  
+  <arg name="plugin_tags" default="REAL, SIL"/>
+    
   <node pkg="scrimmage_ros"
         name="entity_1"
         type="auctioneer"
         output="screen">
-    <param name="wrap_all" value="true" type="bool"/>
     <param name="mission_file" value="$(arg mission_file)" type="str"/>
-    <param name="max_contacts" value="$(arg max_contacts)" type="int"/>
-    <param name="entity_name" value="agent" type="str"/>
+    <param name="entity_tag" value="entity_1" type="str"/>
+    <param name="plugin_tags" type="string" value="$(arg plugin_tags)"/>
     <param name="entity_id" value="1" type="int"/>    
+    <param name="max_contacts" value="$(arg max_contacts)" type="int"/>
+    <param name="loop_rate_hz" type="double" value="10"/>    
   </node>
   
   <node pkg="scrimmage_ros"
@@ -19,9 +22,11 @@
         type="auctioneer"
         output="screen">
     <param name="mission_file" value="$(arg mission_file)" type="str"/>
-    <param name="max_contacts" value="$(arg max_contacts)" type="int"/>
-    <param name="entity_name" value="agent" type="str"/>
+    <param name="entity_tag" value="entity_2" type="str"/>
+    <param name="plugin_tags" type="string" value="$(arg plugin_tags)"/>
     <param name="entity_id" value="2" type="int"/>    
+    <param name="max_contacts" value="$(arg max_contacts)" type="int"/>
+    <param name="loop_rate_hz" type="double" value="10"/>    
   </node>
   
 </launch> 
