@@ -38,6 +38,8 @@
 #include "ros/ros.h"
 #include "nodelet/nodelet.h"
 
+#include <scrimmage_ros/scrimmage_ros.h>
+
 namespace scrimmage_ros {
 
 class Nodelet : public nodelet::Nodelet {
@@ -48,10 +50,9 @@ class Nodelet : public nodelet::Nodelet {
     virtual bool init() { return true; }
     virtual bool step() { return true; }
 
-    scrimmage::External external_;
-    std::string ros_log_dir_ = "";
-    int entity_id_ = 1;
- private:
+    std::shared_ptr<scrimmage_ros> sc_ros;
+
+private:
     void onInit() override;
     void timer_cb(const ros::TimerEvent& event);
     ros::Timer loop_timer_;

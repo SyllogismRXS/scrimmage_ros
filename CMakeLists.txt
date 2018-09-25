@@ -216,12 +216,21 @@ include_directories(${EIGEN3_INCLUDE_DIR})
 # target_link_libraries(scrimmage_autonomy_node ${catkin_LIBRARIES} ${SCRIMMAGE_LIBRARIES})
 # add_dependencies(scrimmage_autonomy_node ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 
-# Declare a C++ library
+# Create the primary scrimmage_ros library
+add_library(scrimmage_ros
+  ./src/scrimmage_ros.cpp
+  )
+target_link_libraries(scrimmage_ros
+  scrimmage-core
+  )
+
+# Build the scrimmage nodelet
 add_library(scrimmage_nodelet
   ./src/nodelet.cpp
   )
 target_link_libraries(scrimmage_nodelet
   scrimmage-core
+  scrimmage_ros
   )
 
 # the auction node
