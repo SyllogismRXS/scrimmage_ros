@@ -1,7 +1,6 @@
 <launch>
 
   <arg name="mission_file" default="auction_assign"/>
-  <arg name="entity_tag" default="uuv_entity"/>  
   <arg name="max_contacts" default="100"/>
   <arg name="plugin_tags" default="REAL, SIL"/>
     
