@@ -1,6 +1,8 @@
 cmake_minimum_required(VERSION 2.8.3)
 project(scrimmage_ros)
 
+set(CATKIN_BUILD_BINARY_PACKAGE ON)
+
 # see : https://crascit.com/2016/04/09/using-ccache-with-cmake/
 find_program(CCACHE_PROGRAM ccache)
 if(CCACHE_PROGRAM)
@@ -114,8 +116,8 @@ generate_dynamic_reconfigure_options(
 ## CATKIN_DEPENDS: catkin_packages dependent projects also need
 ## DEPENDS: system dependencies of this project that dependent projects also need
 catkin_package(
-#  INCLUDE_DIRS include
- # LIBRARIES scrimmage_ros
+ INCLUDE_DIRS include
+ LIBRARIES scrimmage_ros
  CATKIN_DEPENDS roscpp roscpp sensor_msgs std_msgs geometry_msgs
 #  DEPENDS system_lib
 )
@@ -195,12 +197,12 @@ else()
 endif()
 
 # Allow scrimmage to find the maps in this repo:
-set(SCRIMMAGE_LOCAL_CONFIG_DIR "$ENV{HOME}/.scrimmage")
-set(SCRIMMAGE_ENV_DIR "${SCRIMMAGE_LOCAL_CONFIG_DIR}/env")
-file(MAKE_DIRECTORY ${SCRIMMAGE_ENV_DIR})
-configure_file(${CMAKE_SOURCE_DIR}/${PROJECT_NAME}/cmake/Modules/setenv.in
-  "${SCRIMMAGE_ENV_DIR}/${PROJECT_NAME}-setenv" @ONLY)
-execute_process(COMMAND bash "-c" "${CMAKE_SOURCE_DIR}/${PROJECT_NAME}/scripts/edit-config.sh ${SCRIMMAGE_LOCAL_CONFIG_DIR} ${PROJECT_NAME}" OUTPUT_VARIABLE result)
+# set(SCRIMMAGE_LOCAL_CONFIG_DIR "$ENV{HOME}/.scrimmage")
+# set(SCRIMMAGE_ENV_DIR "${SCRIMMAGE_LOCAL_CONFIG_DIR}/env")
+# file(MAKE_DIRECTORY ${SCRIMMAGE_ENV_DIR})
+# configure_file(${CMAKE_SOURCE_DIR}/${PROJECT_NAME}/cmake/Modules/setenv.in
+#   "${SCRIMMAGE_ENV_DIR}/${PROJECT_NAME}-setenv" @ONLY)
+# execute_process(COMMAND bash "-c" "${CMAKE_SOURCE_DIR}/${PROJECT_NAME}/scripts/edit-config.sh ${SCRIMMAGE_LOCAL_CONFIG_DIR} ${PROJECT_NAME}" OUTPUT_VARIABLE result)
 
 ################################################
 # Find packages required by scrimmage plugins

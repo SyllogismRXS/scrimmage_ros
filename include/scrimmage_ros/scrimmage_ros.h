@@ -8,11 +8,13 @@
 #include <scrimmage_ros/scrimmage_ros.h>
 #include <dynamic_reconfigure/server.h>
 
-#include <iostream>
+#include <string>
 
 namespace scrimmage_ros {
 class scrimmage_ros {
-public:
+ public:
+    scrimmage_ros() = default;
+
     scrimmage_ros(ros::NodeHandle &nh, ros::NodeHandle &private_nh,
                   const std::string &node_name);
     bool init(std::ostream &out = std::cout);
@@ -20,7 +22,8 @@ public:
     bool step(const double &t, std::ostream &out = std::cout);
     static std::string exec_command(const char* cmd);
     scrimmage::External &external() { return external_; }
-protected:
+
+ protected:
     ros::NodeHandle nh_;
     ros::NodeHandle private_nh_;
     std::string node_name_;
@@ -33,7 +36,6 @@ protected:
     dynamic_reconfigure::Server<scrimmage_rosConfig> dyn_reconf_server_;
     dynamic_reconfigure::Server<scrimmage_rosConfig>::CallbackType dyn_reconf_f_;
     void dyn_reconf_cb(scrimmage_rosConfig &config, uint32_t level);
-private:
 };
 } // namespace scrimmage_ros
 #endif // SCRIMMAGE_ROS_SCRIMMAGE_ROS_H_
