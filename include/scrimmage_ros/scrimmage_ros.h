@@ -4,6 +4,9 @@
 #include <scrimmage/entity/External.h>
 
 #include "ros/ros.h"
+#include <scrimmage_ros/scrimmage_rosConfig.h>
+#include <scrimmage_ros/scrimmage_ros.h>
+#include <dynamic_reconfigure/server.h>
 
 #include <iostream>
 
@@ -26,6 +29,10 @@ protected:
     std::string ros_log_dir_ = "";
     int entity_id_ = 1;
     double loop_rate_hz_ = 1.0;
+
+    dynamic_reconfigure::Server<scrimmage_rosConfig> dyn_reconf_server_;
+    dynamic_reconfigure::Server<scrimmage_rosConfig>::CallbackType dyn_reconf_f_;
+    void dyn_reconf_cb(scrimmage_rosConfig &config, uint32_t level);
 private:
 };
 } // namespace scrimmage_ros

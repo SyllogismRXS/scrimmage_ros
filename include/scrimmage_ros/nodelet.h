@@ -35,12 +35,10 @@
 
 #include <scrimmage/entity/External.h>
 
+#include <scrimmage_ros/scrimmage_ros.h>
+
 #include "ros/ros.h"
 #include "nodelet/nodelet.h"
-#include <dynamic_reconfigure/server.h>
-#include <scrimmage_ros/uuv_ex1Config.h>
-
-#include <scrimmage_ros/scrimmage_ros.h>
 
 namespace scrimmage_ros {
 
@@ -58,11 +56,6 @@ private:
     void onInit() override;
     void timer_cb();
     ros::Timer loop_timer_;
-
-    void callback(uuv_ex1Config &config, uint32_t level);
-
-    dynamic_reconfigure::Server<uuv_ex1Config> server_;
-    dynamic_reconfigure::Server<uuv_ex1Config>::CallbackType f_;
 };
 
 } // namespace scrimmage_ros

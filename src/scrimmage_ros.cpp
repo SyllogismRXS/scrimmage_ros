@@ -1,10 +1,12 @@
 #include <scrimmage_ros/scrimmage_ros.h>
+#include <scrimmage/parse/ParseUtils.h>
 
 #include <iostream>
 #include <memory>
 #include <array>
 #include <stdexcept>
 #include <cstdio>
+#include <stdexcept>
 
 #include <XmlRpcValue.h>
 #include <time.h>
@@ -107,6 +109,11 @@ bool scrimmage_ros::init(std::ostream &out) {
     } else {
         out << node_name_ << ": failed to load plugins for " << entity_tag << endl;
     }
+
+    // Setup the dynamic reconfigure callback
+    dyn_reconf_f_ = boost::bind(&scrimmage_ros::dyn_reconf_cb, this, _1, _2);
+    dyn_reconf_server_.setCallback(dyn_reconf_f_);
+
     return true;
 }
 
@@ -133,6 +140,53 @@ std::string scrimmage_ros::exec_command(const char* cmd) {
 
 const double & scrimmage_ros::loop_rate_hz() {
     return loop_rate_hz_;
+}
+
+void scrimmage_ros::dyn_reconf_cb(scrimmage_rosConfig &config, uint32_t level) {
+    (void)level; // the level parameter is not being used
+
+    // If the callback is being called with the "default" message, ignore the
+    // message
+    if (config.param_name == scrimmage_rosConfig::__getDefault__().param_name) {
+        return;
+    }
+
+    try {
+        switch(config.param_type) {
+        case scrimmage_ros_int:
+            external_.param_server()->set_param<int>(
+                config.param_name, std::stoi(config.param_value));
+            break;
+        case scrimmage_ros_bool:
+            external_.param_server()->set_param<bool>(
+                config.param_name, sc::str2bool(config.param_value));
+            break;
+        case scrimmage_ros_double:
+            external_.param_server()->set_param<double>(
+                config.param_name, std::stod(config.param_value));
+            break;
+        case scrimmage_ros_float:
+            external_.param_server()->set_param<float>(
+                config.param_name, std::stof(config.param_value));
+            break;
+        case scrimmage_ros_string:
+            external_.param_server()->set_param<std::string>(
+                config.param_name, config.param_value);
+            break;
+        default:
+            std::cout << "scrimmage_ros dynamic reconfigure warning" << endl;
+            std::cout << "param_name: " << config.param_name << endl;
+            std::cout << "param_type: " << config.param_type << endl;
+            std::cout << "param_value: " << config.param_value << endl;
+            break;
+        }
+    } catch(const std::invalid_argument &ia) {
+        std::cerr << "scrimmage_ros dynamic reconfigure exception: " << endl;
+        std::cerr << ia.what() << endl;
+        std::cerr << "param_name: " << config.param_name << endl;
+        std::cerr << "param_type: " << config.param_type << endl;
+        std::cerr << "param_value: " << config.param_value << endl;
+    }
 }
 
 } // scrimmage_ros

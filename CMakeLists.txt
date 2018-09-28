@@ -101,7 +101,7 @@ generate_messages(DEPENDENCIES geometry_msgs)
 
 # Generate dynamic reconfigure parameters in the 'cfg' folder
 generate_dynamic_reconfigure_options(
-  cfg/uuv_ex1.cfg
+  cfg/scrimmage_ros.cfg
   )
 
 ###################################
@@ -222,7 +222,9 @@ add_library(scrimmage_ros
   )
 target_link_libraries(scrimmage_ros
   scrimmage-core
+  ${catkin_LIBRARIES}
   )
+add_dependencies(scrimmage_ros ${PROJECT_NAME}_gencfg)
 
 # Build the scrimmage nodelet
 add_library(scrimmage_nodelet
@@ -233,8 +235,6 @@ target_link_libraries(scrimmage_nodelet
   scrimmage-core
   scrimmage_ros
   )
-
-add_dependencies(scrimmage_nodelet ${PROJECT_NAME}_gencfg)
 
 # the auction node
 add_executable(auctioneer src/auctioneer.cpp)
