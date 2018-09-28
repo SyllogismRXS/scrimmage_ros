@@ -24,6 +24,7 @@ find_package(catkin REQUIRED COMPONENTS
   geometry_msgs
   tf
   message_generation
+  dynamic_reconfigure
 )
 
 ## System dependencies are found with CMake's conventions
@@ -98,11 +99,10 @@ generate_messages(DEPENDENCIES geometry_msgs)
 ##   * uncomment the "generate_dynamic_reconfigure_options" section below
 ##     and list every .cfg file to be processed
 
-## Generate dynamic reconfigure parameters in the 'cfg' folder
-# generate_dynamic_reconfigure_options(
-#   cfg/DynReconf1.cfg
-#   cfg/DynReconf2.cfg
-# )
+# Generate dynamic reconfigure parameters in the 'cfg' folder
+generate_dynamic_reconfigure_options(
+  cfg/uuv_ex1.cfg
+  )
 
 ###################################
 ## catkin specific configuration ##
@@ -229,9 +229,12 @@ add_library(scrimmage_nodelet
   ./src/nodelet.cpp
   )
 target_link_libraries(scrimmage_nodelet
+  ${catkin_LIBRARIES}
   scrimmage-core
   scrimmage_ros
   )
+
+add_dependencies(scrimmage_nodelet ${PROJECT_NAME}_gencfg)
 
 # the auction node
 add_executable(auctioneer src/auctioneer.cpp)

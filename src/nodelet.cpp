@@ -59,6 +59,12 @@ namespace fs = boost::filesystem;
 namespace scrimmage_ros {
 Nodelet::Nodelet() {
 }
+
+void Nodelet::callback(uuv_ex1Config &config, uint32_t level) {
+    NODELET_INFO_STREAM("Reconfigure request, " << config.max_speed);
+    sc_ros->external().param_server()->set_param<double>("max_speed", config.max_speed);
+}
+
 void Nodelet::onInit() {
     // Get ROS node handles
     ros::NodeHandle nh = getNodeHandle();
@@ -74,13 +80,14 @@ void Nodelet::onInit() {
         NODELET_ERROR_STREAM("init() call failed in " << this->getName());
     }
 
+    f_ = boost::bind(&Nodelet::callback, this, _1, _2);
+    server_.setCallback(f_);
+
     // Start the callback step()
     loop_timer_ = nh.createTimer(ros::Duration(1.0/sc_ros->loop_rate_hz()),
-                                 boost::bind(&Nodelet::timer_cb, this, _1));
+                                 boost::bind(&Nodelet::timer_cb, this));
 }
-void Nodelet::timer_cb(const ros::TimerEvent& event) {
-    NODELET_INFO_STREAM("The time is now " << event.current_real);
-
+void Nodelet::timer_cb() {
     std::ostringstream buf;
     sc_ros->step(ros::Time::now().toSec(), buf);
     if (buf.str() != "") {

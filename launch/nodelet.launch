@@ -12,6 +12,6 @@
     <param name="plugin_tags" type="string" value="$(arg plugin_tags)"/>
     <param name="entity_id" value="$(arg entity_id)" type="int"/>
     <param name="max_contacts" value="$(arg max_contacts)" type="int"/>
-    <param name="loop_rate_hz" type="double" value="1"/>
+    <param name="loop_rate_hz" type="double" value="20"/>
   </node>
 </launch>
