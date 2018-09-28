@@ -276,6 +276,15 @@ add_dependencies(auctioneer scrimmage_ros_generate_messages_cpp)
 #   PATTERN ".svn" EXCLUDE
 # )
 
+install(TARGETS scrimmage_ros
+  LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
+)
+
+# https://github.com/ros-perception/slam_gmapping/pull/56 
+install(FILES nodelet_plugins.xml
+  DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}
+)
+
 ## Mark other files for installation (e.g. launch and bag files, etc.)
 install(FILES
   test/test_auction.launch
@@ -322,3 +331,19 @@ if(CATKIN_ENABLE_TESTING)
       scrimmage_ros
       gtest_main)
 endif()
+
+###############################################################################
+# Binary installation generation
+###############################################################################
+set(CPACK_INSTALL_CMAKE_PROJECTS "${CMAKE_CURRENT_BINARY_DIR};${PROJECT_NAME};ALL;/")
+set(CPACK_OUTPUT_CONFIG_FILE "${PROJECT_BINARY_DIR}/CPackConfig.cmake")
+set(CPACK_PACKAGE_VERSION "0.0.1")
+set(CPACK_GENERATOR "DEB")
+set(CPACK_PACKAGE_NAME ${PROJECT_NAME})
+# set(CPACK_DEBIAN_PACKAGE_ARCHITECTURE "${MULTIARCH}")
+set(CPACK_PACKAGE_RELEASE 1)
+set(CPACK_PACKAGE_CONTACT "Kevin DeMarco")
+set(CPACK_PACKAGE_VENDOR "GTRI")
+set(CPACK_PACKAGING_INSTALL_PREFIX ${ROS_INSTALL_PREFIX})
+set(CPACK_PACKAGE_FILE_NAME "${CPACK_PACKAGE_NAME}-${CPACK_PACKAGE_VERSION}-${CPACK_PACKAGE_RELEASE}.${CMAKE_SYSTEM_PROCESSOR}")
+include(CPack)

@@ -1,3 +1,4 @@
+<?xml version="1.0"?>
 <library path="lib/libscrimmage_nodelet">
   <class name="scrimmage_ros/Nodelet" type="scrimmage_ros::Nodelet" base_class_type="nodelet::Nodelet">
   <description>
