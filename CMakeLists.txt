@@ -180,21 +180,8 @@ find_package(scrimmage)
 include_directories(${SCRIMMAGE_INCLUDE_DIRS})
 
 if (SCRIMMAGE_ENABLE_PYTHON_BINDINGS)
-
+  # FIXME: scrimmage should use target_compile_definitions
   add_definitions(-DENABLE_PYTHON_BINDINGS=1)
-  find_package(PythonInterp ${SCRIMMAGE_PYTHONLIBS_VERSION_STRING} REQUIRED)
-  find_package(PythonLibs ${SCRIMMAGE_PYTHONLIBS_VERSION_STRING} REQUIRED)
-
-  message(STATUS "Python Versions Found: ${PYTHONLIBS_VERSION_STRING}")
-  message(STATUS "PYTHON_LIBRARIES : ${PYTHON_LIBRARIES}")
-  message(STATUS "PYTHON_INCLUDE_DIRS: ${PYTHON_INCLUDE_DIRS}")
-
-  set(PYTHON_FOUND TRUE)
-  find_package(pybind11 REQUIRED)
-  include_directories(${pybind11_INCLUDE_DIRS})
-  set(PYBIND11_INCLUDE_DIRS ${pybind11_INCLUDE_DIRS})
-  include_directories("${PYTHON_INCLUDE_DIRS}")
-
 else()
   add_definitions(-DENABLE_PYTHON_BINDINGS=0)
 endif()
