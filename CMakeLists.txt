@@ -11,6 +11,9 @@ else()
   message("ccache not found, repeated builds will be faster if this program is installed")
 endif()
 
+set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH}
+    ${CMAKE_CURRENT_SOURCE_DIR}/cmake/Modules)
+
 ## Add support for C++11, supported in ROS Kinetic and newer
 # add_definitions(-std=c++11)
 
@@ -209,8 +212,20 @@ endif()
 ###############################################
 find_package(Protobuf 3.3.0 REQUIRED)
 include_directories(${PROTOBUF_INCLUDE_DIRS})
-find_package(Eigen3 REQUIRED)
+
+find_package(Eigen3 QUIET)
+
+if (NOT Eigen3_FOUND)
+  include(LibFindMacros)
+  libfind_pkg_check_modules(EIGEN_PKGCONFIG eigen3)
+  if (EIGEN_PKGCONFIG_INCLUDE_DIRS STREQUAL "")
+    message(FATAL_ERROR "could not find eigen either through find_package or pkgconfig")
+  endif()
+  set(EIGEN3_INCLUDE_DIR ${EIGEN_PKGCONFIG_INCLUDE_DIRS})
+  message("Found Eigen with pkg-config, EIGEN3_INCLUDE_DIR: ${EIGEN3_INCLUDE_DIR}")
+endif()
 include_directories(${EIGEN3_INCLUDE_DIR})
+
 
 # # Create the scrimmage_autonomy node
 # add_executable(scrimmage_autonomy_node src/scrimmage_autonomy.cpp)
