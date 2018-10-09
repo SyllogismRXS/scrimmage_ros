@@ -1,0 +1,13 @@
+<launch>  
+
+  <include file="$(find scrimmage_ros)/launch/nodelet.launch">
+    <arg name="mission_file" default="uuv-ex1"/>    
+  </include>
+
+  <test
+    test-name="test_dyn_param"
+    pkg="scrimmage_ros"
+    type="test_dyn_param">
+  </test>
+
+</launch>
