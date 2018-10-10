@@ -223,6 +223,7 @@ include_directories(${EIGEN3_INCLUDE_DIR})
 # Create the primary scrimmage_ros library
 add_library(scrimmage_ros
   ./src/scrimmage_ros.cpp
+  ./src/dynamic_param_client.cpp
   )
 target_link_libraries(scrimmage_ros
   scrimmage-core
@@ -282,7 +283,7 @@ install(TARGETS scrimmage_ros
   LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
 )
 
-# https://github.com/ros-perception/slam_gmapping/pull/56 
+# https://github.com/ros-perception/slam_gmapping/pull/56
 install(FILES nodelet_plugins.xml
   DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}
 )
@@ -332,6 +333,18 @@ if(CATKIN_ENABLE_TESTING)
       scrimmage-python
       scrimmage_ros
       gtest_main)
+
+    add_rostest_gtest(test_dyn_param
+      test/test_dyn_param.launch
+      test/test_dyn_param.cpp
+      )
+    target_link_libraries(test_dyn_param
+      ${catkin_LIBRARIES}
+      scrimmage-core
+      scrimmage-python
+      scrimmage_ros
+      gtest_main
+      )
 endif()
 
 ###############################################################################
