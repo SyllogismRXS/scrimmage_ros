@@ -23,6 +23,16 @@ bool dynamic_param_client::update_dynamic_param_servers() {
         // Get list of services
         std::string gh = res[2][2][i][0].toXml().c_str();
 
+        // Returns true if the service string (gh) contains "str"
+        auto exclude = [&] (const std::string &str) {
+                           return gh.find(str) != std::string::npos;
+                       };
+        // Does this service belong to a node that we are excluding?
+        if (std::any_of(exclude_nodes_.begin(), exclude_nodes_.end(),
+                        exclude)) {
+            continue;
+        }
+
         // Get the service name between the <value> </value> tags
         std::size_t first_pos = gh.find(start_delim_);
         std::size_t last_pos = gh.find_last_of(end_delim_);

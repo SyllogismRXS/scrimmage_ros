@@ -17,12 +17,14 @@ class dynamic_param_client {
     const std::unordered_map<std::string, std::shared_ptr<dynamic_reconfigure::Client<scrimmage_rosConfig>>> &services() {
         return services_;
     }
+    std::set<std::string> &exclude_nodes() { return exclude_nodes_; }
 
  protected:
     std::string name_;
     std::unordered_map<std::string, std::shared_ptr<dynamic_reconfigure::Client<scrimmage_rosConfig>>> services_;
     const std::string start_delim_ = "<value>";
     const std::string end_delim_ = "</value>";
+    std::set<std::string> exclude_nodes_;
 };
 } // namespace scrimmage_ros
 #endif // SCRIMMAGE_ROS_DYNAMIC_PARAM_CLIENT_H_
