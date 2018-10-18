@@ -102,8 +102,6 @@ bool scrimmage_ros::init(std::ostream &out) {
         out << node_name_ << ": ROS log directory doesn't exist: " << ros_log_dir_ << endl;
     }
 
-    std::cout << "ROS LOG DIRECTORY IS " << ros_log_dir_ << std::endl;
-
     const bool create_entity =
         external_.create_entity(mission_file, entity_tag, plugin_tags_str,
                                 entity_id_, max_contacts,
