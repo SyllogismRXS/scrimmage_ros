@@ -90,9 +90,9 @@ int main(int argc, char **argv) {
     // Get a private node handle to parse ros params
     ros::NodeHandle private_nh("~");
 
-    scrimmage_ros::scrimmage_ros sc_ros(nh, private_nh, ros::this_node::getName());
+    scrimmage_ros::scrimmage_ros sc_ros;
     std::ostringstream buf;
-    sc_ros.init(buf);
+    sc_ros.init(private_nh, buf);
     ROS_INFO_STREAM(buf.str());
 
     ros::Publisher pub_start_auction;

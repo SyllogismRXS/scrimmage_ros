@@ -66,8 +66,8 @@ void Nodelet::onInit() {
     ros::NodeHandle private_nh = getPrivateNodeHandle();
 
     std::ostringstream buf;
-    sc_ros = std::make_shared<scrimmage_ros>(nh, private_nh, this->getName());
-    sc_ros->init(buf);
+    sc_ros = std::make_shared<scrimmage_ros>();
+    sc_ros->init(private_nh, buf);
     NODELET_INFO_STREAM(buf.str());
 
     // Call init() for subclasses

@@ -18,7 +18,15 @@ bool dynamic_param_client::update_dynamic_param_servers() {
     XmlRpc::XmlRpcValue res;
     XmlRpc::XmlRpcValue pay;
 
-    ros::master::execute("getSystemState", req, res, pay, true);
+    if(not ros::master::execute("getSystemState", req, res, pay, true)) {
+        std::cout << "Failed to call ros::master::execute getSystemState" << std::endl;
+        return false;
+    }
+    if (res.size() < 3 || res[2].size() < 3) {
+        std::cout << "Invalid response from getSystemState" << std::endl;
+        return false;
+    }
+
     for(int i = 0; i < res[2][2].size(); i++) {
         // Get list of services
         std::string gh = res[2][2][i][0].toXml().c_str();
@@ -37,8 +45,8 @@ bool dynamic_param_client::update_dynamic_param_servers() {
         std::size_t first_pos = gh.find(start_delim_);
         std::size_t last_pos = gh.find_last_of(end_delim_);
         if (first_pos == std::string::npos || last_pos == std::string::npos) {
-            std::cout << "Invalid service: " << gh << std::endl;
-            return false;
+            std::cout << "Ignore non-scrimmage service: " << gh << std::endl;
+            continue;
         }
 
         std::size_t end_pos_of_first_delim = first_pos + start_delim_.length();

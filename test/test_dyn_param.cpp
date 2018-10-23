@@ -54,15 +54,14 @@ class DynParamTest : public testing::Test {
 };
 
 TEST_F(DynParamTest, DynParamSet) {
-    ros::Rate loop_rate(0.1);
-    loop_rate.sleep();
-    ros::spinOnce();
-
-    // Wait for the other ROS nodes to start
-    std::this_thread::sleep_for (std::chrono::seconds(2));
-
     // Update the list of SCRIMMAGE nodes using dynamic reconfigure
-    param_client_.update_dynamic_param_servers();
+    uint64_t count = 0;
+    while (param_client_.services().size() != 1 && count < 1e5) {
+        if (not param_client_.update_dynamic_param_servers()) {
+            break;
+        }
+        ++count;
+    }
 
     // There should only be one other scrimmage_ros node
     EXPECT_EQ(param_client_.services().size(), 1);

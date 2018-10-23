@@ -14,10 +14,8 @@ namespace scrimmage_ros {
 class scrimmage_ros {
  public:
     scrimmage_ros() = default;
-
-    scrimmage_ros(ros::NodeHandle &nh, ros::NodeHandle &private_nh,
-                  const std::string &node_name);
-    bool init(std::ostream &out = std::cout);
+    bool init(const ros::NodeHandle &nh = ros::NodeHandle("~"),
+              std::ostream &out = std::cout);
     const double & loop_rate_hz();
     bool step(const double &t, std::ostream &out = std::cout);
     static std::string exec_command(const char* cmd);
@@ -25,15 +23,12 @@ class scrimmage_ros {
 
  protected:
     ros::NodeHandle nh_;
-    ros::NodeHandle private_nh_;
-    std::string node_name_;
-
     scrimmage::External external_;
     std::string ros_log_dir_ = "";
     int entity_id_ = 1;
     double loop_rate_hz_ = 1.0;
 
-    dynamic_reconfigure::Server<scrimmage_rosConfig> dyn_reconf_server_;
+    std::shared_ptr<dynamic_reconfigure::Server<scrimmage_rosConfig>> dyn_reconf_server_;
     dynamic_reconfigure::Server<scrimmage_rosConfig>::CallbackType dyn_reconf_f_;
     void dyn_reconf_cb(scrimmage_rosConfig &config, uint32_t level);
 };
