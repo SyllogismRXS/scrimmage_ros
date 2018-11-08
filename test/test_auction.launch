@@ -29,7 +29,7 @@
     </node>
 
   <test
-    test-name="test_auction2"
+    test-name="test_auction"
     pkg="scrimmage_ros"
     type="test_auction">
 
