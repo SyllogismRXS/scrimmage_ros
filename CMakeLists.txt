@@ -179,13 +179,6 @@ endif()
 find_package(scrimmage)
 include_directories(${SCRIMMAGE_INCLUDE_DIRS})
 
-if (SCRIMMAGE_ENABLE_PYTHON_BINDINGS)
-  # FIXME: scrimmage should use target_compile_definitions
-  add_definitions(-DENABLE_PYTHON_BINDINGS=1)
-else()
-  add_definitions(-DENABLE_PYTHON_BINDINGS=0)
-endif()
-
 # Allow scrimmage to find the maps in this repo:
 # set(SCRIMMAGE_LOCAL_CONFIG_DIR "$ENV{HOME}/.scrimmage")
 # set(SCRIMMAGE_ENV_DIR "${SCRIMMAGE_LOCAL_CONFIG_DIR}/env")
