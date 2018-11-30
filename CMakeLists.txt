@@ -274,6 +274,7 @@ install(DIRECTORY include/${PROJECT_NAME}/
 
 install(TARGETS scrimmage_ros
   LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
+  ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
 )
 
 # https://github.com/ros-perception/slam_gmapping/pull/56
