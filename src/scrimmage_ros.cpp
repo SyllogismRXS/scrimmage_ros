@@ -100,6 +100,8 @@ bool scrimmage_ros::init(const ros::NodeHandle &nh, std::ostream &out) {
         out << "ROS log directory doesn't exist: " << ros_log_dir_ << endl;
     }
 
+
+    external_.set_time(ros::Time::now().toSec(), 1.0 / loop_rate_hz_);
     const bool create_entity =
         external_.create_entity(mission_file, entity_tag, plugin_tags_str,
                                 entity_id_, max_contacts,
