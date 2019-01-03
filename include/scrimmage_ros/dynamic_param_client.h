@@ -3,7 +3,13 @@
 
 #include "ros/ros.h"
 #include <scrimmage_ros/scrimmage_rosConfig.h>
+
+// There's a warning being generated in the ROS header because of out-of-order
+// initialization. We don't want to see that particular warning.
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wreorder"
 #include <dynamic_reconfigure/client.h>
+#pragma GCC diagnostic pop
 
 #include <string>
 #include <unordered_map>
