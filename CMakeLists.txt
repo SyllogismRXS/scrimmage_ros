@@ -306,6 +306,15 @@ install(FILES
 if(CATKIN_ENABLE_TESTING)
     find_package(rostest REQUIRED)
 
+    # If gtest was directly compiled from a place catkin doesn't expect, catkin
+    # will set GTEST_FOUND to false no matter what the current value, and the
+    # add_rostest_gtest() calls below will not add their targets, which will
+    # cause their subsequent target_link_library() calls to fail
+    # fatally.
+    if (TARGET gtest_main)
+      set(GTEST_FOUND TRUE)
+    endif()
+
     add_rostest_gtest(test_auction
       test/test_auction.launch
       test/test_auction.cpp
