@@ -15,7 +15,8 @@ class scrimmage_ros {
  public:
     scrimmage_ros() = default;
     bool init(const ros::NodeHandle &nh = ros::NodeHandle("~"),
-              std::ostream &out = std::cout);
+              std::ostream &out = std::cout,
+              boost::optional<double> init_time = boost::none);
     const double & loop_rate_hz();
     bool step(const double &t, std::ostream &out = std::cout);
     static std::string exec_command(const char* cmd);
