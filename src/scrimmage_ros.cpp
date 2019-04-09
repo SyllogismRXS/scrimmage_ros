@@ -15,6 +15,8 @@
 #include <boost/filesystem.hpp>
 #undef BOOST_NO_CXX11_SCOPED_ENUMS
 
+#include <boost/optional.hpp>
+
 namespace sc = scrimmage;
 namespace fs = boost::filesystem;
 using std::cout;
@@ -22,7 +24,8 @@ using std::endl;
 
 namespace scrimmage_ros {
 
-bool scrimmage_ros::init(const ros::NodeHandle &nh, std::ostream &out) {
+bool scrimmage_ros::init(const ros::NodeHandle &nh, std::ostream &out,
+                         boost::optional<double> init_time) {
     nh_ = nh;
 
     if (not nh_.getParam("loop_rate_hz", loop_rate_hz_)) {
@@ -100,11 +103,13 @@ bool scrimmage_ros::init(const ros::NodeHandle &nh, std::ostream &out) {
         out << "ROS log directory doesn't exist: " << ros_log_dir_ << endl;
     }
 
+    const double init_time_create = init_time ? *init_time : ros::Time::now().toSec();
+    const double init_dt_create = 1.0 / loop_rate_hz_;
 
-    external_.set_time(ros::Time::now().toSec(), 1.0 / loop_rate_hz_);
     const bool create_entity =
         external_.create_entity(mission_file, entity_tag, plugin_tags_str,
                                 entity_id_, max_contacts,
+                                init_time_create, init_dt_create,
                                 ros_log_dir_ + "/scrimmage",
                                 param_override_func);
     if (create_entity) {
