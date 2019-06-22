@@ -32,19 +32,19 @@ bool scrimmage_ros::init(const ros::NodeHandle &nh, std::ostream &out,
         out << "missing ros param: loop_rate_hz." << endl;
     }
 
-    std::string mission_file;
+    std::string mission_file = "";
     if (not nh_.getParam("mission_file", mission_file)) {
         out << "missing ros param: mission_file." << endl;
         return false;
     }
 
-    std::string entity_tag;
+    std::string entity_tag = "";
     if (not nh_.getParam("entity_tag", entity_tag)) {
         out << "missing ros param: entity_tag." << endl;
         return false;
     }
 
-    std::string plugin_tags_str;
+    std::string plugin_tags_str = "";
     if (not nh_.getParam("plugin_tags", plugin_tags_str)) {
         out << "missing ros param: plugin_tags." << endl;
     }
@@ -115,7 +115,8 @@ bool scrimmage_ros::init(const ros::NodeHandle &nh, std::ostream &out,
     if (create_entity) {
         external_.print_plugins(out);
     } else {
-        out << "failed to load plugins for " << entity_tag << endl;
+        out << "Failed to load plugins for entity_tag: " << entity_tag << endl;
+        return false;
     }
 
     // Setup the dynamic reconfigure callback
