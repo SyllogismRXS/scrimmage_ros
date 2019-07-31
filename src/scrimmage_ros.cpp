@@ -161,9 +161,6 @@ void scrimmage_ros::dyn_reconf_cb(scrimmage_rosConfig &config, uint32_t level) {
         return;
     }
 
-    std::cout << "scrimmage_ros::dyn_reconf_cb: param_name: " << config.param_name << endl;
-    std::cout << "scrimmage_ros::dyn_reconf_cb: param_value: " << config.param_value << endl;
-
     try {
         switch(config.param_type) {
         case scrimmage_ros_int:
