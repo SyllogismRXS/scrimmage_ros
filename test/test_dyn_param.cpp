@@ -38,6 +38,7 @@
 
 #include <thread>
 #include <chrono>
+#include <vector>
 
 #include <iostream>
 using std::cout;
@@ -57,7 +58,17 @@ TEST_F(DynParamTest, DynParamSet) {
     // Update the list of SCRIMMAGE nodes using dynamic reconfigure
     uint64_t count = 0;
     while (param_client_.services().size() != 1 && count < 1e5) {
-        if (not param_client_.update_dynamic_param_servers()) {
+        auto gen_configs = [](std::vector<scrimmage_ros::scrimmage_rosConfig> list) -> void {
+            scrimmage_ros::scrimmage_rosConfig config;
+            config.param_name = "random_variable";
+            config.param_value = "12345";
+            config.param_type = scrimmage_ros::scrimmage_ros_int;
+            list.push_back(config);
+        };
+        //Node: We need a test for not passing in a generator, at a time when it does detect a new service.
+        //      Then, this test for passing in a generator, at a time when it does detect a new service.
+        //      The way this test is currently structured, launching other nodes without time delays, that's not possible.
+        if (not param_client_.update_dynamic_param_servers(gen_configs)) {
             break;
         }
         ++count;
