@@ -75,7 +75,7 @@ TEST_F(DynParamTest, DynParamSet) {
     }
 
     // There should only be one other scrimmage_ros node
-    EXPECT_EQ(param_client_.services().size(), 1);
+    EXPECT_EQ(param_client_.services().size(), static_cast<unsigned int>(1));
 
     // Create a configuration to send
     scrimmage_ros::scrimmage_rosConfig config;
