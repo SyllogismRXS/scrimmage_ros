@@ -24,15 +24,37 @@ bool dynamic_param_client::update_dynamic_param_servers(
         std::cout << "Failed to call ros::master::execute getSystemState" << std::endl;
         return false;
     }
+    // Response format is:
+    //   [code,
+    //    status,
+    //    systemstate] i.e. res[2]
+    // systemstate:
+    //   [publishers,
+    //    subscribers,
+    //    services]    i.e. res[2][2]
+    // services:
+    //   [service, [service, [...]]] i.e. res[2][2][i]
+    // service:
+    //   [servicename, i.e. res[2][2][i][0]
+    //    [serviceprovider, [serviceprovider [...]]]
     if (res.size() < 3 || res[2].size() < 3) {
         std::cout << "Invalid response from getSystemState" << std::endl;
         return false;
     }
 
+    // Get the current namespace
+    std::string this_namespace = ros::this_node::getNamespace(); // defined as '//<namespace.'
+    if (this_namespace.size() < 2) {
+      return false; // something is wrong if we don't see the // prefix
+    }
+    this_namespace = this_namespace.substr(2, std::string::npos); // save the name itself
+    //std::cout << "dynamic_param_client::update_dynamic_param_servers: Current ROS namespace: " << this_namespace << std::endl;
+
     std::vector<std::string> updated_service_names_list;
     for(int i = 0; i < res[2][2].size(); i++) {
         // Get list of services
         std::string gh = res[2][2][i][0].toXml().c_str();
+        //std::cout << "dynamic_param_client::update_dynamic_param_servers: service string: " << gh << std::endl;
 
         // Returns true if the service string (gh) contains "str"
         auto exclude = [&] (const std::string &str) {
@@ -48,7 +70,7 @@ bool dynamic_param_client::update_dynamic_param_servers(
         std::size_t first_pos = gh.find(start_delim_);
         std::size_t last_pos = gh.find_last_of(end_delim_);
         if (first_pos == std::string::npos || last_pos == std::string::npos) {
-            std::cout << "Ignore non-scrimmage service: " << gh << std::endl;
+            std::cout << "Ignoring badly formatted service name: " << gh << std::endl;
             continue;
         }
 
@@ -59,10 +81,20 @@ bool dynamic_param_client::update_dynamic_param_servers(
         // Determine if this service_name uses dynamic_reconfigure's
         // set_parameters service name
         std::size_t set_param_pos = service_name.find("/set_parameters");
-        if (set_param_pos != std::string::npos) {
-            std::string node_name = service_name.substr(0, set_param_pos);
-            updated_service_names_list.push_back(node_name);
+        if (set_param_pos == std::string::npos) {
+            continue; // not a service we care about
         }
+
+        // Determine if this node is inside this current node's namespace
+        std::string node_name = service_name.substr(0, set_param_pos);
+        std::size_t found_this_namespace = node_name.find(this_namespace);
+        if (found_this_namespace == std::string::npos) {
+            continue; // not a service we care about
+        }
+
+        // Save the final found node that has the matching service
+        updated_service_names_list.push_back(node_name);
+        //std::cout << "dynamic_param_client::update_dynamic_param_servers: Found service: " << node_name << std::endl;
     }
     // Populate the updated client list
     std::unordered_map<std::string, std::shared_ptr<dynamic_reconfigure::Client<scrimmage_rosConfig>>> updated_services_list;
