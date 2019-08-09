@@ -13,6 +13,9 @@ dynamic_param_client::dynamic_param_client(const std::string &name)
 
 bool dynamic_param_client::update_dynamic_param_servers(
        std::function<void(std::vector<scrimmage_rosConfig>&)> generate_current_config_list) {
+
+    std::lock_guard<std::recursive_mutex> lock(mutex_);
+
     XmlRpc::XmlRpcValue req = "/node";
     XmlRpc::XmlRpcValue res;
     XmlRpc::XmlRpcValue pay;
@@ -94,7 +97,14 @@ bool dynamic_param_client::update_dynamic_param_servers(
 }
 
 bool dynamic_param_client::send_config(const scrimmage_rosConfig &config) {
-    auto send_config = [&](auto &s) { return s.second->setConfiguration(config); };
+
+    std::lock_guard<std::recursive_mutex> lock(mutex_);
+
+    auto send_config = [&](auto &s) {
+      //printf("dynamic_param_client::send_config: service: %s name: %s type: %d value: %s\n", s.first.c_str(), config.param_name.c_str(), (int) config.param_type, config.param_value.c_str());
+      return s.second->setConfiguration(config);
+    };
+
     return std::all_of(services_.begin(), services_.end(), send_config);
 }
 } // namespace scrimmage_ros
