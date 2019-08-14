@@ -21,7 +21,7 @@ bool dynamic_param_client::update_dynamic_param_servers(
     XmlRpc::XmlRpcValue pay;
 
     if(not ros::master::execute("getSystemState", req, res, pay, true)) {
-        std::cout << "Failed to call ros::master::execute getSystemState" << std::endl;
+        std::cout << "dynamic_param_client::update_dynamic_param_servers: Failed to call ros::master::execute getSystemState" << std::endl;
         return false;
     }
     // Response format is:
@@ -38,17 +38,19 @@ bool dynamic_param_client::update_dynamic_param_servers(
     //   [servicename, i.e. res[2][2][i][0]
     //    [serviceprovider, [serviceprovider [...]]]
     if (res.size() < 3 || res[2].size() < 3) {
-        std::cout << "Invalid response from getSystemState" << std::endl;
+        std::cout << "dynamic_param_client::update_dynamic_param_servers: Invalid response from getSystemState" << std::endl;
         return false;
     }
 
     // Get the current namespace
-    std::string this_namespace = ros::this_node::getNamespace(); // defined as '//<namespace.'
-    if (this_namespace.size() < 2) {
-      return false; // something is wrong if we don't see the // prefix
+    std::string this_namespace = ros::this_node::getNamespace(); // defined as '/<namespace>', where <namespace> is '/<name>', so no namespace just returns as '/'
+    //std::cout << "dynamic_param_client::update_dynamic_param_servers: Current RAW ROS namespace string: '" << this_namespace << "'" << std::endl;
+    if (this_namespace.size() < 1) {
+      std::cout << "dynamic_param_client::update_dynamic_param_servers: Badly formatted RAW ROS namespace string: '" << this_namespace << "'" << std::endl;
+      return false; // something is wrong if we don't see the '/' prefix
     }
-    this_namespace = this_namespace.substr(2, std::string::npos); // save the name itself
-    //std::cout << "dynamic_param_client::update_dynamic_param_servers: Current ROS namespace: " << this_namespace << std::endl;
+    this_namespace = this_namespace.substr(1, std::string::npos); // save the '/<name>' itself
+    //std::cout << "dynamic_param_client::update_dynamic_param_servers: Current ROS namespace: '" << this_namespace << "'" << std::endl;
 
     std::vector<std::string> updated_service_names_list;
     for(int i = 0; i < res[2][2].size(); i++) {
@@ -87,10 +89,13 @@ bool dynamic_param_client::update_dynamic_param_servers(
 
         // Determine if this node is inside this current node's namespace
         std::string node_name = service_name.substr(0, set_param_pos);
-        std::size_t found_this_namespace = node_name.find(this_namespace);
-        if (found_this_namespace == std::string::npos) {
-            continue; // not a service we care about
-        }
+        if (!this_namespace.empty()) {
+            //only use nodes inside this namespace
+            std::size_t found_this_namespace = node_name.find(this_namespace);
+            if (found_this_namespace == std::string::npos) {
+                continue; // not a service we care about
+            }
+        } // else: allow all nodes, even those inside other namespaces
 
         // Save the final found node that has the matching service
         updated_service_names_list.push_back(node_name);

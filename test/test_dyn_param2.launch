@@ -1,7 +1,5 @@
 <launch>  
-  <!-- The '/' used as the namespace appears to mirror a no-namespace case. -->
-  <!-- Using an empty string is not allowed. -->
-  <arg name="namespace" default="/"/>
+  <arg name="namespace" default="testnamespace"/>
 
   <include file="$(find scrimmage_ros)/launch/nodelet.launch">
     <arg name="mission_file" value="uuv-ex1"/>

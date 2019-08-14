@@ -287,6 +287,8 @@ install(FILES
   test/test_auction.launch
   test/test_auction2.launch
   test/test_two_subscribers.launch
+  test/test_dyn_param.launch
+  test/test_dyn_param2.launch
   # myfile2
   DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}
 )
@@ -355,6 +357,18 @@ if(CATKIN_ENABLE_TESTING)
       test/test_dyn_param.cpp
       )
     target_link_libraries(test_dyn_param
+      ${catkin_LIBRARIES}
+      scrimmage-core
+      scrimmage-python
+      scrimmage_ros
+      gtest_main
+      )
+
+    add_rostest_gtest(test_dyn_param2
+      test/test_dyn_param2.launch
+      test/test_dyn_param.cpp
+      )
+    target_link_libraries(test_dyn_param2
       ${catkin_LIBRARIES}
       scrimmage-core
       scrimmage-python
