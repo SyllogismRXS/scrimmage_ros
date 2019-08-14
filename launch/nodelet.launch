@@ -4,9 +4,18 @@
   <arg name="entity_id" default="1"/>
   <arg name="max_contacts" default="100"/>
   <arg name="plugin_tags" default="REAL, SIL"/>
+  <arg name="namespace" default="/"/>
 
-  <node pkg="nodelet" type="nodelet" name="standalone_nodelet"  args="manager" output="screen"/>
-  <node pkg="nodelet" type="nodelet" name="scrimmage_nodelet" args="load scrimmage_ros/Nodelet standalone_nodelet" output="screen">
+  <node pkg="nodelet" type="nodelet" name="manager_nodelet"
+        args="manager"
+        output="screen"
+        ns="$(arg namespace)"
+        />
+  <node pkg="nodelet" type="nodelet" name="scrimmage_nodelet"
+        args="load scrimmage_ros/Nodelet manager_nodelet"
+        output="screen"
+        ns="$(arg namespace)"
+        >
     <param name="mission_file" value="$(arg mission_file)" type="str"/>
     <param name="entity_tag" value="$(arg entity_tag)" type="str"/>
     <param name="plugin_tags" type="string" value="$(arg plugin_tags)"/>
