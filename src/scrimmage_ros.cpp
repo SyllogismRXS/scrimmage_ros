@@ -89,6 +89,13 @@ bool scrimmage_ros::init(const ros::NodeHandle &nh, std::ostream &out,
                     } else {
                         out << "Can't parse XmlRpc param: " << resolved_param << endl;
                     }
+
+                    if (debug_level > 0) {
+                        out << "Overriding scrimmage plugin parameter ("
+                            << kv.first << ") with ROS parameter value ("
+                            << kv.second  << "). " << endl;
+                    }
+
                 } else {
                     out << "Failed to retrieve XMLRpc value for: " << resolved_param << endl;
                 }

@@ -6,6 +6,7 @@
   <include file="$(find scrimmage_ros)/launch/nodelet.launch">
     <arg name="mission_file" value="uuv-ex1"/>
     <arg name="namespace" value="$(arg namespace)"/>
+    <arg name="debug_level" default="1"/>
   </include>
 
   <test
