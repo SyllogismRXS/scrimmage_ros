@@ -58,6 +58,9 @@ bool scrimmage_ros::init(const ros::NodeHandle &nh, std::ostream &out,
         out << "missing ros param: max_contacts." << endl;
     }
 
+    int debug_level = 1; // default to printing loaded plugins, but not params
+    nh_.getParam("debug_level", debug_level);
+
     auto param_override_func = [&](std::map<std::string, std::string>& param_map) {
         for (auto &kv : param_map) {
             std::string resolved_param;
@@ -111,9 +114,11 @@ bool scrimmage_ros::init(const ros::NodeHandle &nh, std::ostream &out,
                                 entity_id_, max_contacts,
                                 init_time_create, init_dt_create,
                                 ros_log_dir_ + "/scrimmage",
-                                param_override_func);
+                                param_override_func, debug_level);
     if (create_entity) {
-        external_.print_plugins(out);
+        if (debug_level > 0) {
+            external_.print_plugins(out);
+        }
     } else {
         out << "Failed to load plugins for entity_tag: " << entity_tag << endl;
         return false;

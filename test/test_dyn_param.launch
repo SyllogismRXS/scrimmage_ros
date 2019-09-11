@@ -1,4 +1,4 @@
-<launch>  
+<launch>
   <!-- The '/' used as the namespace appears to mirror a no-namespace case. -->
   <!-- Using an empty string is not allowed. -->
   <arg name="namespace" default="/"/>
