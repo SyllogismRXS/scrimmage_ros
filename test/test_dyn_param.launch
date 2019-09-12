@@ -4,9 +4,11 @@
   <arg name="namespace" default="/"/>
 
   <include file="$(find scrimmage_ros)/launch/nodelet.launch">
-    <arg name="mission_file" value="uuv-ex1"/>
+    <arg name="mission_file" value="test_api"/>
     <arg name="namespace" value="$(arg namespace)"/>
-    <arg name="debug_level" default="1"/>
+    <arg name="debug_level" default="2"/>
+    <arg name="entity_tag" default="my_agent"/>
+    <arg name="plugin_tags" default="REAL"/>
   </include>
 
   <test

@@ -36,6 +36,9 @@
 #include <scrimmage_ros/scrimmage_rosConfig.h>
 #include <scrimmage_ros/dynamic_param_client.h>
 
+#include <scrimmage/common/CSV.h>
+#include <scrimmage/parse/ParseUtils.h>
+
 #include <thread>
 #include <chrono>
 #include <vector>
@@ -43,6 +46,8 @@
 #include <iostream>
 using std::cout;
 using std::endl;
+
+namespace sc = scrimmage;
 
 class DynParamTest : public testing::Test {
  protected:
@@ -65,9 +70,11 @@ TEST_F(DynParamTest, DynParamSet) {
             config.param_type = scrimmage_ros::scrimmage_ros_int;
             list.push_back(config);
         };
-        //Node: We need a test for not passing in a generator, at a time when it does detect a new service.
-        //      Then, this test for passing in a generator, at a time when it does detect a new service.
-        //      The way this test is currently structured, launching other nodes without time delays, that's not possible.
+        // Note: We need a test for not passing in a generator, at a time when
+        //      it does detect a new service.  Then, this test for passing in a
+        //      generator, at a time when it does detect a new service.  The
+        //      way this test is currently structured, launching other nodes
+        //      without time delays, that's not possible.
         if (not param_client_.update_dynamic_param_servers(gen_configs)) {
             break;
         }
@@ -77,14 +84,58 @@ TEST_F(DynParamTest, DynParamSet) {
     // There should only be one other scrimmage_ros node
     EXPECT_EQ(param_client_.services().size(), static_cast<unsigned int>(1));
 
-    // Create a configuration to send
-    scrimmage_ros::scrimmage_rosConfig config;
-    config.param_name = "max_speed";
-    config.param_value = "15.023";
-    config.param_type = scrimmage_ros::scrimmage_ros_double;
+    ///////////////////////////////////////////////////////////////////////////
+    // Change each of the APITester plugin's dynamic plugin parameters
+    ///////////////////////////////////////////////////////////////////////////
+    // bool interface
+    scrimmage_ros::scrimmage_rosConfig config_bool;
+    config_bool.param_name = "my_test_bool";
+    config_bool.param_value = "false";
+    config_bool.param_type = scrimmage_ros::scrimmage_ros_bool;
+    EXPECT_TRUE(param_client_.send_config(config_bool));
 
-    // Send the configuration
-    EXPECT_TRUE(param_client_.send_config(config));
+    // int interface
+    scrimmage_ros::scrimmage_rosConfig config_int;
+    config_int.param_name = "my_test_int";
+    config_int.param_value = "2";
+    config_int.param_type = scrimmage_ros::scrimmage_ros_int;
+    EXPECT_TRUE(param_client_.send_config(config_int));
+
+    // float interface
+    scrimmage_ros::scrimmage_rosConfig config_float;
+    config_float.param_name = "my_test_float";
+    config_float.param_value = "3.2";
+    config_float.param_type = scrimmage_ros::scrimmage_ros_float;
+    EXPECT_TRUE(param_client_.send_config(config_float));
+
+    // double interface
+    scrimmage_ros::scrimmage_rosConfig config_double;
+    config_double.param_name = "my_test_double";
+    config_double.param_value = "98.987";
+    config_double.param_type = scrimmage_ros::scrimmage_ros_double;
+    EXPECT_TRUE(param_client_.send_config(config_double));
+
+    sc::CSV csv;
+    EXPECT_TRUE(csv.read_csv(sc::expand_user("~/.scrimmage/logs/latest/api_tester.csv")));
+
+    // Expected CSV output (one parameter changes in each row):
+    sc::CSV expected_csv;
+    expected_csv.read_csv_from_string(
+        "my_test_bool,my_test_int,my_test_float,my_test_double\n"
+        "1,1,2.100000,99.987000\n"
+        "0,1,2.100000,99.987000\n"
+        "0,2,2.100000,99.987000\n"
+        "0,2,3.200000,99.987000\n"
+        "0,2,3.200000,98.987000");
+
+    bool equal = csv.equals(expected_csv);
+    EXPECT_TRUE(equal);
+    if (not equal) {
+        std::cerr << "Expected the following CSV table: " << std::endl;
+        std::cerr << expected_csv << endl;
+        std::cerr << "But the actual CSV table is: " << std::endl;
+        std::cerr << csv << endl;
+    }
 }
 
 int main(int argc, char **argv) {
