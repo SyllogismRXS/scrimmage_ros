@@ -1,4 +1,5 @@
 #include <scrimmage_ros/scrimmage_ros.h>
+#include <scrimmage_ros/ScrimmageNodeAdvertise.h>
 #include <scrimmage/parse/ParseUtils.h>
 
 #include <iostream>
@@ -7,6 +8,8 @@
 #include <stdexcept>
 #include <cstdio>
 #include <stdexcept>
+#include <chrono>
+#include <thread>
 
 #include <XmlRpcValue.h>
 #include <time.h>
@@ -135,6 +138,27 @@ bool scrimmage_ros::init(const ros::NodeHandle &nh, std::ostream &out,
     dyn_reconf_f_ = boost::bind(&scrimmage_ros::dyn_reconf_cb, this, _1, _2);
     dyn_reconf_server_ = std::make_shared<dynamic_reconfigure::Server<scrimmage_rosConfig>>();
     dyn_reconf_server_->setCallback(dyn_reconf_f_);
+
+    // Advertise node name to dynamic_param_client
+    std::string node_name = ros::this_node::getName();
+    ros::ServiceClient client = nh_.serviceClient<ScrimmageNodeAdvertise>("/sc_node_advertise");
+    ScrimmageNodeAdvertise srv;
+    srv.request.nodeName = node_name;
+
+    int num_tries = 10; // don't try infinitely
+    bool success = false;
+    do {
+        // this is supposed to wait for server to exist and be available,
+        // but calls to the service still sometimes fail after it, so
+        // potentially something is wrong here.
+        client.waitForExistence();
+        success = client.call(srv);
+        num_tries--;
+    } while (!success && num_tries > 0);
+
+    if (num_tries == 0) {
+        ROS_ERROR("scrimmage_ros: Failed to access the sc_node_advertise service.\n");
+    }
 
     return true;
 }

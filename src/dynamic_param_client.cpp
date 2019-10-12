@@ -11,6 +11,22 @@ namespace scrimmage_ros {
 dynamic_param_client::dynamic_param_client(const std::string &name)
     : name_(name) {}
 
+bool dynamic_param_client::advertise_node_name(scrimmage_ros::ScrimmageNodeAdvertise::Request &req,
+                                               scrimmage_ros::ScrimmageNodeAdvertise::Response &res) {
+    ROS_INFO("dynamic_param_client: Adding the %s node to the include set.",
+             req.nodeName.c_str());
+
+    include_nodes_.insert(req.nodeName);
+    return true;
+}
+
+void dynamic_param_client::init(ros::NodeHandle nh) {
+    ROS_INFO("dynamic_param_client: Initializing sc_node_advertise service.");
+    scNodeAdvertiseService_ = nh.advertiseService("sc_node_advertise",
+                                                  &dynamic_param_client::advertise_node_name,
+                                                  this);
+}
+
 bool dynamic_param_client::update_dynamic_param_servers(
        std::function<void(std::vector<scrimmage_rosConfig>&)> generate_current_config_list) {
 
@@ -59,12 +75,19 @@ bool dynamic_param_client::update_dynamic_param_servers(
         //std::cout << "dynamic_param_client::update_dynamic_param_servers: service string: " << gh << std::endl;
 
         // Returns true if the service string (gh) contains "str"
-        auto exclude = [&] (const std::string &str) {
-                           return gh.find(str) != std::string::npos;
-                       };
+        auto node_found = [&] (const std::string &str) {
+            return gh.find(str) != std::string::npos;
+        };
+
         // Does this service belong to a node that we are excluding?
         if (std::any_of(exclude_nodes_.begin(), exclude_nodes_.end(),
-                        exclude)) {
+                        node_found)) {
+            continue;
+        }
+
+        // Does this service belong to a node that we are including?
+        if (not std::any_of(include_nodes_.begin(), include_nodes_.end(),
+                            node_found)) {
             continue;
         }
 
@@ -99,7 +122,7 @@ bool dynamic_param_client::update_dynamic_param_servers(
 
         // Save the final found node that has the matching service
         updated_service_names_list.push_back(node_name);
-        //std::cout << "dynamic_param_client::update_dynamic_param_servers: Found service: " << node_name << std::endl;
+        // std::cout << "dynamic_param_client::update_dynamic_param_servers: Found service: " << node_name << std::endl;
     }
     // Populate the updated client list
     std::unordered_map<std::string, std::shared_ptr<dynamic_reconfigure::Client<scrimmage_rosConfig>>> updated_services_list;
