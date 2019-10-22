@@ -61,6 +61,9 @@ bool scrimmage_ros::init(const ros::NodeHandle &nh, std::ostream &out,
         out << "missing ros param: max_contacts." << endl;
     }
 
+    bool enable_dyn_reconf = true;
+    nh_.getParam("enable_dyn_reconf", enable_dyn_reconf);
+
     int debug_level = 1; // default to printing loaded plugins, but not params
     nh_.getParam("debug_level", debug_level);
 
@@ -134,32 +137,37 @@ bool scrimmage_ros::init(const ros::NodeHandle &nh, std::ostream &out,
         return false;
     }
 
-    // Setup the dynamic reconfigure callback
-    dyn_reconf_f_ = boost::bind(&scrimmage_ros::dyn_reconf_cb, this, _1, _2);
-    dyn_reconf_server_ = std::make_shared<dynamic_reconfigure::Server<scrimmage_rosConfig>>();
-    dyn_reconf_server_->setCallback(dyn_reconf_f_);
+    if (enable_dyn_reconf) {
+        // Setup the dynamic reconfigure callback
+        dyn_reconf_f_ = boost::bind(&scrimmage_ros::dyn_reconf_cb, this, _1, _2);
+        dyn_reconf_server_ = std::make_shared<dynamic_reconfigure::Server<scrimmage_rosConfig>>();
+        dyn_reconf_server_->setCallback(dyn_reconf_f_);
 
-    // Advertise node name to dynamic_param_client
-    std::string node_name = ros::this_node::getName();
-    ros::ServiceClient client = nh_.serviceClient<ScrimmageNodeAdvertise>("/sc_node_advertise");
-    ScrimmageNodeAdvertise srv;
-    srv.request.nodeName = node_name;
+        // Advertise node name to dynamic_param_client
+        ros::ServiceClient client = nh_.serviceClient<ScrimmageNodeAdvertise>("sc_node_advertise");
 
-    int num_tries = 10; // don't try infinitely
-    bool success = false;
-    do {
-        // this is supposed to wait for server to exist and be available,
-        // but calls to the service still sometimes fail after it, so
-        // potentially something is wrong here.
-        client.waitForExistence();
-        success = client.call(srv);
-        num_tries--;
-    } while (!success && num_tries > 0);
+        if (not client.waitForExistence()) {
+            ROS_ERROR("scrimmage_ros: Failed to wait for sc_node_advertise service.\n");
+            return false;
+        }
 
-    if (num_tries == 0) {
-        ROS_ERROR("scrimmage_ros: Failed to access the sc_node_advertise service.\n");
+        int num_tries = 10; // don't try infinitely
+        bool success = false;
+        do {
+            // this is supposed to wait for server to exist and be available,
+            // but calls to the service still sometimes fail after it, so
+            // potentially something is wrong here.
+            ScrimmageNodeAdvertise srv;
+            srv.request.nodeName = ros::this_node::getName();
+
+            success = client.call(srv);
+        } while (!success && num_tries-- > 0);
+
+        if (not success) {
+            ROS_ERROR("scrimmage_ros: Failed to call the sc_node_advertise service.\n");
+            return false;
+        }
     }
-
     return true;
 }
 

@@ -13,22 +13,24 @@ dynamic_param_client::dynamic_param_client(const std::string &name)
 
 bool dynamic_param_client::advertise_node_name(scrimmage_ros::ScrimmageNodeAdvertise::Request &req,
                                                scrimmage_ros::ScrimmageNodeAdvertise::Response &res) {
-    ROS_INFO("dynamic_param_client: Adding the %s node to the include set.",
+    ROS_INFO("dynamic_param_client: Adding %s to the include set.",
              req.nodeName.c_str());
 
     include_nodes_.insert(req.nodeName);
+
+    res.status = true;
+
     return true;
 }
 
-void dynamic_param_client::init(ros::NodeHandle nh) {
-    ROS_INFO("dynamic_param_client: Initializing sc_node_advertise service.");
+void dynamic_param_client::init(ros::NodeHandle &nh) {
     scNodeAdvertiseService_ = nh.advertiseService("sc_node_advertise",
                                                   &dynamic_param_client::advertise_node_name,
                                                   this);
 }
 
 bool dynamic_param_client::update_dynamic_param_servers(
-       std::function<void(std::vector<scrimmage_rosConfig>&)> generate_current_config_list) {
+    std::function<void(std::vector<scrimmage_rosConfig>&)> generate_current_config_list) {
 
     std::lock_guard<std::recursive_mutex> lock(mutex_);
 

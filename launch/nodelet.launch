@@ -15,8 +15,7 @@
   <node pkg="nodelet" type="nodelet" name="scrimmage_nodelet"
         args="load scrimmage_ros/Nodelet manager_nodelet"
         output="screen"
-        ns="$(arg namespace)"
-        >
+        ns="$(arg namespace)">
     <param name="mission_file" value="$(arg mission_file)" type="str"/>
     <param name="entity_tag" value="$(arg entity_tag)" type="str"/>
     <param name="plugin_tags" type="string" value="$(arg plugin_tags)"/>
@@ -24,5 +23,7 @@
     <param name="max_contacts" value="$(arg max_contacts)" type="int"/>
     <param name="loop_rate_hz" type="double" value="20"/>
     <param name="debug_level" type="double" value="$(arg debug_level)"/>
+
+    <remap from="/$(arg namespace)/scrimmage_nodelet/sc_node_advertise" to="/$(arg namespace)/sc_node_advertise"/>
   </node>
 </launch>

@@ -26,7 +26,7 @@ class dynamic_param_client {
     //   std::set which keeps track of acceptable nodes for later
     //   dynamic reconfigure mesasges. Function keeps track of
     //   include_nodes_ variable.
-    void init(ros::NodeHandle nh);
+    void init(ros::NodeHandle &nh);
     bool advertise_node_name(scrimmage_ros::ScrimmageNodeAdvertise::Request &req,
                              scrimmage_ros::ScrimmageNodeAdvertise::Response &res);
     // update_dynamic_param_servers

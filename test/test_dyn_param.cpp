@@ -52,17 +52,20 @@ namespace sc = scrimmage;
 class DynParamTest : public testing::Test {
  protected:
     void SetUp() override {
-        ros::NodeHandle private_nh("~");
-        ros::NodeHandle nh_;
     }
+    ros::NodeHandle nh_;
     scrimmage_ros::dynamic_param_client param_client_;
  public:
 };
 
 TEST_F(DynParamTest, DynParamSet) {
+    param_client_.init(nh_);
+
     // Update the list of SCRIMMAGE nodes using dynamic reconfigure
     uint64_t count = 0;
     while (param_client_.services().size() != 1 && count < 1e5) {
+        ros::spinOnce(); // Process callbacks
+
         auto gen_configs = [](std::vector<scrimmage_ros::scrimmage_rosConfig> list) -> void {
             scrimmage_ros::scrimmage_rosConfig config;
             config.param_name = "random_variable";
@@ -141,6 +144,5 @@ TEST_F(DynParamTest, DynParamSet) {
 int main(int argc, char **argv) {
     ::testing::InitGoogleTest(&argc, argv);
     ros::init(argc, argv, "dyn_param_test");
-    ros::start();
     return RUN_ALL_TESTS();
 }

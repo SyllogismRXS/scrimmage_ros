@@ -3,6 +3,7 @@
   <arg name="mission_file" default="auction_assign3"/>
   <arg name="max_contacts" default="100"/>
   <arg name="plugin_tags" default="REAL, SIL"/>
+  <arg name="enable_dyn_reconf" default="false"/>
 
   <node pkg="scrimmage_ros"
         name="entity_1"
@@ -14,6 +15,7 @@
     <param name="entity_id" value="1" type="int"/>
     <param name="max_contacts" value="$(arg max_contacts)" type="int"/>
     <param name="loop_rate_hz" type="double" value="10"/>
+    <param name="enable_dyn_reconf" type="bool" value="$(arg enable_dyn_reconf)"/>
   </node>
 
   <test
@@ -27,4 +29,3 @@
 
   </test>
 </launch>
-
