@@ -221,7 +221,7 @@ target_link_libraries(scrimmage_ros
   scrimmage-core
   ${catkin_LIBRARIES}
   )
-add_dependencies(scrimmage_ros ${PROJECT_NAME}_gencfg)
+add_dependencies(scrimmage_ros ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 
 # Build the scrimmage nodelet
 add_library(scrimmage_nodelet
@@ -232,6 +232,7 @@ target_link_libraries(scrimmage_nodelet
   scrimmage-core
   scrimmage_ros
   )
+add_dependencies(scrimmage_nodelet ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 
 # the auction node
 add_executable(auctioneer src/auctioneer.cpp)
@@ -241,7 +242,7 @@ target_link_libraries(auctioneer
   scrimmage-python
   scrimmage_ros
   )
-add_dependencies(auctioneer scrimmage_ros_generate_messages_cpp)
+add_dependencies(auctioneer ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 
 #############
 ## Install ##
