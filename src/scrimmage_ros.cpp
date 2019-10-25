@@ -64,6 +64,9 @@ bool scrimmage_ros::init(const ros::NodeHandle &nh, std::ostream &out,
     bool enable_dyn_reconf = true;
     nh_.getParam("enable_dyn_reconf", enable_dyn_reconf);
 
+    std::string mission_file_overrides = "";
+    nh_.getParam("mission_file_overrides", mission_file_overrides);
+
     int debug_level = 1; // default to printing loaded plugins, but not params
     nh_.getParam("debug_level", debug_level);
 
@@ -127,7 +130,8 @@ bool scrimmage_ros::init(const ros::NodeHandle &nh, std::ostream &out,
                                 entity_id_, max_contacts,
                                 init_time_create, init_dt_create,
                                 ros_log_dir_ + "/scrimmage",
-                                param_override_func, debug_level);
+                                param_override_func, mission_file_overrides,
+                                debug_level);
     if (create_entity) {
         if (debug_level > 0) {
             external_.print_plugins(out);

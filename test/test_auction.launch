@@ -1,9 +1,12 @@
 <launch>
 
-  <arg name="mission_file" default="auction_assign2"/>
+  <arg name="mission_file" default="auction_assign"/>
   <arg name="max_contacts" default="100"/>
   <arg name="plugin_tags" default="REAL, SIL"/>
   <arg name="enable_dyn_reconf" default="false"/>
+  <arg name="mission_file_overrides" default="latitude_origin=35.987654321,
+                                              longitude_origin=-121.1234567890,
+                                              altitude_origin=400.123456789"/>
 
   <node pkg="scrimmage_ros"
         name="entity_1"
@@ -16,6 +19,7 @@
     <param name="max_contacts" value="$(arg max_contacts)" type="int"/>
     <param name="loop_rate_hz" type="double" value="10"/>
     <param name="enable_dyn_reconf" type="bool" value="$(arg enable_dyn_reconf)"/>
+    <param name="mission_file_overrides" type="string" value="$(arg mission_file_overrides)"/>
   </node>
 
   <node pkg="scrimmage_ros"
@@ -29,6 +33,7 @@
     <param name="max_contacts" value="$(arg max_contacts)" type="int"/>
     <param name="loop_rate_hz" type="double" value="10"/>
     <param name="enable_dyn_reconf" type="bool" value="$(arg enable_dyn_reconf)"/>
+    <param name="mission_file_overrides" type="string" value="$(arg mission_file_overrides)"/>
   </node>
 
   <test
