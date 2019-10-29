@@ -23,7 +23,5 @@
     <param name="max_contacts" value="$(arg max_contacts)" type="int"/>
     <param name="loop_rate_hz" type="double" value="20"/>
     <param name="debug_level" type="double" value="$(arg debug_level)"/>
-
-    <remap from="/$(arg namespace)/scrimmage_nodelet/sc_node_advertise" to="/$(arg namespace)/sc_node_advertise"/>
   </node>
 </launch>

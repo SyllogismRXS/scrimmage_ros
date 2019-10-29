@@ -148,7 +148,8 @@ bool scrimmage_ros::init(const ros::NodeHandle &nh, std::ostream &out,
         dyn_reconf_server_->setCallback(dyn_reconf_f_);
 
         // Advertise node name to dynamic_param_client
-        ros::ServiceClient client = nh_.serviceClient<ScrimmageNodeAdvertise>("sc_node_advertise");
+        std::string sc_node_advertise_resolved = ros::names::resolve("sc_node_advertise");
+        ros::ServiceClient client = nh_.serviceClient<ScrimmageNodeAdvertise>(sc_node_advertise_resolved);
 
         if (not client.waitForExistence()) {
             ROS_ERROR("scrimmage_ros: Failed to wait for sc_node_advertise service.\n");
