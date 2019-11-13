@@ -3,12 +3,9 @@
   <!-- Using an empty string is not allowed. -->
   <arg name="namespace" default="/"/>
 
-  <include file="$(find scrimmage_ros)/launch/nodelet.launch">
-    <arg name="mission_file" value="test_api"/>
+  <include file="$(find scrimmage_ros)/test/dyn_param.launch">
     <arg name="namespace" value="$(arg namespace)"/>
-    <arg name="debug_level" default="2"/>
-    <arg name="entity_tag" default="my_agent"/>
-    <arg name="plugin_tags" default="REAL"/>
+    <arg name="test_id" default="1"/>
   </include>
 
   <test
@@ -16,6 +13,8 @@
     pkg="scrimmage_ros"
     type="test_dyn_param"
     ns="$(arg namespace)"
-    />
+    >
+    <param name="test_id" value="1" type="int"/>
+  </test>
 
 </launch>

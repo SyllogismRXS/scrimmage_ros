@@ -1,0 +1,31 @@
+<launch>
+  <arg name="mission_file" default="test_api"/>
+  <arg name="entity_tag" default="my_agent"/>
+  <arg name="entity_id" default="1"/>
+  <arg name="max_contacts" default="100"/>
+  <arg name="plugin_tags" default="REAL"/>
+  <arg name="namespace" default="/"/>
+  <arg name="debug_level" default="2"/>
+  <arg name="csv_file_name" default="api_tester.csv"/>
+  <arg name="test_id" default="0"/>
+
+  <node pkg="nodelet" type="nodelet" name="manager_nodelet"
+        args="manager"
+        output="screen"
+        ns="$(arg namespace)"
+        />
+  <node pkg="nodelet" type="nodelet" name="scrimmage_nodelet"
+        args="load scrimmage_ros/Nodelet manager_nodelet"
+        output="screen"
+        ns="$(arg namespace)">
+    <param name="mission_file" value="$(arg mission_file)" type="str"/>
+    <param name="entity_tag" value="$(arg entity_tag)" type="str"/>
+    <param name="plugin_tags" type="string" value="$(arg plugin_tags)"/>
+    <param name="entity_id" value="$(arg entity_id)" type="int"/>
+    <param name="max_contacts" value="$(arg max_contacts)" type="int"/>
+    <param name="loop_rate_hz" type="double" value="20"/>
+    <param name="debug_level" type="double" value="$(arg debug_level)"/>
+    <param name="csv_file_name" type="str" value="$(arg csv_file_name)"/>
+    <param name="mission_file_overrides" type="str" value="test_id=$(arg test_id)"/>
+  </node>
+</launch>

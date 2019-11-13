@@ -118,8 +118,16 @@ TEST_F(DynParamTest, DynParamSet) {
     config_double.param_type = scrimmage_ros::scrimmage_ros_double;
     EXPECT_TRUE(param_client_.send_config(config_double));
 
+    ros::NodeHandle private_nh("~");
+    int test_id = 0;
+    if (not private_nh.getParam("test_id", test_id)) {
+        ROS_ERROR_STREAM("Missing test_id.");
+    }
+
     sc::CSV csv;
-    EXPECT_TRUE(csv.read_csv(sc::expand_user("~/.scrimmage/logs/latest/api_tester.csv")));
+    EXPECT_TRUE(csv.read_csv(sc::expand_user("~/.scrimmage/logs/test"
+                                             + std::to_string(test_id)
+                                             + "/latest/api_tester.csv")));
 
     // Expected CSV output (one parameter changes in each row):
     sc::CSV expected_csv;
