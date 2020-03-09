@@ -25,3 +25,33 @@ def generate_sim_roslaunch(config):
     env = Environment(loader=file_loader)
 
     return render('sim.template.launch', config, env)
+
+# Given a file, create the directory structure for that file to be created
+def make_file_dirs(file_path):
+    if not os.path.exists(os.path.dirname(file_path)):
+        try:
+            os.makedirs(os.path.dirname(file_path))
+        except OSError as exc: # Guard against race condition
+            if exc.errno != errno.EEXIST:
+                raise
+
+# Given a directory, create the directory structure required
+def make_dirs(directory):
+    if not os.path.exists(directory):
+        try:
+            os.makedirs(directory)
+        except OSError as exc: # Guard against race condition
+            if exc.errno != errno.EEXIST:
+                raise
+
+def ros_launch(package, launch_file, args=''):
+    return 'stdbuf -oL roslaunch ' + package + ' ' + launch_file + ' ' + args
+
+def ros_launch_file(launch_file, args=''):
+    return 'stdbuf -oL roslaunch ' + launch_file + ' ' + args
+
+def gnome_terminal_title(title):
+    return "echo -ne \\\"\\033]0;" + title + "\\007\\\""
+
+def gnome_terminal_cmd(title, cmd):
+    return "gnome-terminal --disable-factory -x bash -c '" + cmd + "; exec bash'"

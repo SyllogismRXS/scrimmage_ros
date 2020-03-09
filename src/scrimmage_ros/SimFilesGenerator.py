@@ -57,7 +57,4 @@ class SimFilesGenerator():
             f.write(scrimmage_ros.utils.generate_sim_roslaunch(config))
 
     def entity_ids(self):
-        ids = []
-        for entity in self.mission_gen.mission_yaml['entities']:
-            ids.append(entity['config']['id'])
-        return ids
+        return self._mission_gen.entity_ids()
