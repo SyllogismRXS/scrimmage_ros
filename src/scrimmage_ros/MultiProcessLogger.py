@@ -28,9 +28,17 @@ class GracefulShutdown:
     def exit_gracefully(self, signum, frame):
         self.shutdown_now = True
 
+class Terminal(Enum):
+    none = 'none'
+    gnome = 'gnome'
+    tmux = 'tmux'
+
+    def __str__(self):
+        return self.value
+
 class MultiProcessLogger():
     def __init__(self):
-        self.terminal = Enum('Terminal', 'none gnome tmux')
+        self.terminal = Terminal
         pass
 
     def enqueue_logging(self, output, queue, process_number):
@@ -61,7 +69,7 @@ class MultiProcessLogger():
             if 'terminal' in process_info[i]:
                 if process_info[i]['terminal'] == self.terminal.gnome:
                     title = sru.gnome_terminal_title('my_window')
-                    cmd = sru.gnome_terminal_cmd(title, cmd)
+                    cmd = sru.gnome_terminal_cmd(title, cmd, process_info[i]['file'])
                     new_shell = True
 
                 elif process_info[i]['terminal'] == self.terminal.tmux:

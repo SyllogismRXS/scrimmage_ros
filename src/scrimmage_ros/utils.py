@@ -59,5 +59,14 @@ def ros_launch_file(launch_file, args=''):
 def gnome_terminal_title(title):
     return "echo -ne \\\"\\033]0;" + title + "\\007\\\""
 
-def gnome_terminal_cmd(title, cmd):
-    return "gnome-terminal --disable-factory -x bash -c '" + cmd + "; exec bash'"
+def gnome_terminal_cmd(title, cmd, log_file):
+    return "gnome-terminal --disable-factory -x bash -c '" + cmd \
+        + " 2>&1 | tee " + log_file + "; exec bash'"
+
+def user_home():
+    # The HOME variable doesn't exist if running as root
+    try:
+        user_home = os.environ['HOME']
+    except KeyError:
+        user_home = '/opt'
+    return user_home

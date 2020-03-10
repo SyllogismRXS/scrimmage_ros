@@ -1,0 +1,10 @@
+<launch>
+  <arg name="team_id" default="1"/>
+  <arg name="entity_id" default="1"/>
+
+  <group ns="entity$(arg entity_id)">
+    <!-- This is only an example -->
+    <!-- Launch your entity/robot nodes here -->
+  </group>
+
+</launch>

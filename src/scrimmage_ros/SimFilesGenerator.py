@@ -49,14 +49,14 @@ class SimFilesGenerator():
         scrimmage.utils.make_dir_tree(sim_dir)
 
         self.mission_file_path = os.path.join(sim_dir, 'temp_mission.xml')
-        self.launch_file_path = os.path.join(sim_dir, 'sim.launch')
 
         with open(self.mission_file_path, 'w') as f:
             f.write(self._mission_gen.mission)
 
-        with open(self.launch_file_path, 'w') as f:
-            config = {'mission_file' : self.mission_file_path}
-            f.write(scrimmage_ros.utils.generate_sim_roslaunch(config))
+        # self.launch_file_path = os.path.join(sim_dir, 'sim.launch')
+        # with open(self.launch_file_path, 'w') as f:
+        #     config = {'mission_file' : self.mission_file_path}
+        #     f.write(scrimmage_ros.utils.generate_sim_roslaunch(config))
 
     def entity_ids(self):
         return self._mission_gen.entity_ids()
