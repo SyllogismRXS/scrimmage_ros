@@ -32,6 +32,8 @@ A Long description goes here.
 
 """
 
+import os
+
 import scrimmage_ros.utils
 
 import scrimmage.utils

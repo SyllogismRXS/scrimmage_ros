@@ -1,3 +1,4 @@
+import os
 import re
 import rospkg
 from jinja2 import FileSystemLoader, Environment
@@ -17,6 +18,10 @@ def ros_find_path(my_string):
     # Replace the $(find <package-name>) in the original string
     return re.sub(pattern, ros_package_path, my_string)
 
+def render(template_name, config, env):
+    template = env.get_template(template_name)
+    return template.render(config = config)
+
 def generate_sim_roslaunch(config):
     # Load the jinja templates
     script_dir_path = os.path.dirname(os.path.realpath(__file__))
@@ -24,7 +29,8 @@ def generate_sim_roslaunch(config):
     file_loader = FileSystemLoader(os.path.join(script_dir_path, 'templates'))
     env = Environment(loader=file_loader)
 
-    return render('sim.template.launch', config, env)
+    template = env.get_template('sim.template.launch')
+    return template.render(config = config)
 
 # Given a file, create the directory structure for that file to be created
 def make_file_dirs(file_path):
