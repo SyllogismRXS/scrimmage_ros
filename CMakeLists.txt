@@ -213,7 +213,7 @@ include_directories(${EIGEN3_INCLUDE_DIR})
 # add_dependencies(scrimmage_autonomy_node ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 
 # Create the primary scrimmage_ros library
-add_library(scrimmage_ros
+add_library(scrimmage_ros SHARED
   ./src/scrimmage_ros.cpp
   ./src/dynamic_param_client.cpp
   )
@@ -224,7 +224,7 @@ target_link_libraries(scrimmage_ros
 add_dependencies(scrimmage_ros ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 
 # Build the scrimmage nodelet
-add_library(scrimmage_nodelet
+add_library(scrimmage_nodelet SHARED
   ./src/nodelet.cpp
   )
 target_link_libraries(scrimmage_nodelet
