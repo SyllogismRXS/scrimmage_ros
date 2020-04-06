@@ -2,4 +2,4 @@ tags
 *.swp
 CATKIN_IGNORE
 *.pyc
-
+scrimmage_ros.egg-info/
