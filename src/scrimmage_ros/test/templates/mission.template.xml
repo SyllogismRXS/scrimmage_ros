@@ -1,0 +1,50 @@
+<?xml version="1.0"?>
+<?xml-stylesheet type="text/xsl" href="http://gtri.gatech.edu"?>
+<runscript xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    name="Cars in 2D Maze">
+
+  <run start="0.0" end="100" dt="0.01"
+       time_warp="{{ config.time_warp }}"
+       enable_gui="true"
+       network_gui="false"
+       start_paused="false"/>
+  <display_progress>false</display_progress>
+
+  <stream_port>50051</stream_port>
+  <stream_ip>localhost</stream_ip>
+
+  <end_condition>none</end_condition> <!-- time, one_team, none-->
+
+  <grid_spacing>10</grid_spacing>
+  <grid_size>200</grid_size>
+
+  <background_color>191 191 191</background_color> <!-- Red Green Blue -->
+  <gui_update_period>10</gui_update_period> <!-- milliseconds -->
+
+  <plot_tracks>false</plot_tracks>
+  <output_type weights_file="unity">all</output_type>
+  <show_plugins>false</show_plugins>
+
+  <log_dir>~/.scrimmage/logs</log_dir>
+
+  <latitude_origin>{{ config.latitude_origin }}</latitude_origin>
+  <longitude_origin>{{ config.longitude_origin }}</longitude_origin>
+  <altitude_origin>{{ config.altitude_origin }}</altitude_origin>
+  <show_origin>true</show_origin>
+  <origin_length>10</origin_length>
+
+  <entity_interaction>ROSClockServer</entity_interaction>
+  <entity_interaction enable_collision_detection="false" show_rays="true">BulletCollision</entity_interaction>
+  <entity_interaction map="maze_2d_1">MapGen2D</entity_interaction>
+
+  <network>GlobalNetwork</network>
+  <network>LocalNetwork</network>
+
+  <!-- uncomment "seed" and use integer for deterministic results -->
+  <!--<seed>1714060370</seed>-->
+
+  {% for entity in config.entities %}
+  {{ entity }}
+  {% endfor %}
+
+</runscript>

@@ -1,0 +1,13 @@
+<launch>
+  <arg name="map_name" default="simple-maze-1"/>
+  <arg name="mission_file" default="ros-ex1.xml"/>
+
+  <param name ="/use_sim_time" value="true"/>
+
+  <!-- run the map server, shared across robots -->
+  <node name="map_server" pkg="map_server" type="map_server"
+        args="$(find scrimmage_ros)/maps/$(arg map_name).yaml">
+    <param name="frame_id" value="/map" />
+  </node>
+
+</launch>

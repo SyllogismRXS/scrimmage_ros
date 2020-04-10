@@ -1,0 +1,19 @@
+<entity>
+    <id>{{ config.id }} </id>
+    <team_id>{{ config.team_id }}</team_id>
+    <color>77 77 255</color>
+    <count>1</count>
+    <health>1</health>
+
+    <sensor order="0" xyz="1.2 0 0.1" rpy="0 0 0">RayTrace</sensor>
+
+    <x>{{ config.x }}</x>
+    <y>{{ config.y }}</y>
+    <z>{{ config.z }}</z>
+    <heading>{{ config.heading }}</heading>
+
+    <controller>DirectController</controller>
+    <motion_model>Unicycle</motion_model>
+    <visual_model>volkswagen</visual_model>
+    <autonomy>ROSAutonomy</autonomy>
+</entity>

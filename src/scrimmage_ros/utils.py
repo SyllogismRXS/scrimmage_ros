@@ -70,3 +70,22 @@ def user_home():
     except KeyError:
         user_home = '/opt'
     return user_home
+
+def make_get_run_dir(base_logs_path):
+    make_dirs(base_logs_path)
+
+    # Determine the next runXXX directory and create it
+    run_num = 0
+    while os.path.exists(base_logs_path + "/run%03d" % run_num):
+        run_num += 1
+
+    log_run_dir = base_logs_path + "/run%03d" % run_num
+    make_dirs(log_run_dir)
+
+    # Create the symlink to the latest run directory
+    latest_symlink = base_logs_path + "/latest"
+    if os.path.islink(latest_symlink):
+        os.remove(latest_symlink)
+    os.symlink(log_run_dir, latest_symlink)
+
+    return log_run_dir

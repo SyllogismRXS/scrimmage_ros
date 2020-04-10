@@ -57,10 +57,11 @@ class MultiProcessLogger():
 
         for i in range(len(process_info)):
             # Setup file descriptors for log files
-            if process_info[i]['file']:
+            if 'file' in process_info[i]:
                 sru.make_file_dirs(process_info[i]['file'])
                 process_info[i]['fd'] = open(process_info[i]['file'], 'a')
             else:
+                process_info[i]['file'] = '/dev/null'
                 process_info[i]['fd'] = None
 
             cmd = process_info[i]['command']

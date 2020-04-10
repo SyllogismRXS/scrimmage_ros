@@ -13,7 +13,7 @@ global and local costmaps.
 <launch>
 
   <!-- input variables -->
-  <arg name="robot_name" default="robot1"/>
+  <arg name="entity_name" default="entity1"/>
   <arg name="initial_pose_x" default="0.0"/>
   <arg name="initial_pose_y" default="0.0"/>
   <arg name="initial_pose_yaw" default="0.0"/>
@@ -23,7 +23,7 @@ global and local costmaps.
   <node pkg="amcl" type="amcl" name="amcl" >
     <param name="tf_broadcast" value="true"/>
     <param name="use_map_topic" value="true"/>
-    <param name="tf_prefix" value="$(arg robot_name)"/>
+    <param name="tf_prefix" value="$(arg entity_name)"/>
     <param name="odom_model_type" value="diff"/>
     <param name="odom_alpha5" value="0.1"/>
     <param name="transform_tolerance" value="0.2" />
@@ -50,8 +50,8 @@ global and local costmaps.
     <param name="laser_likelihood_max_dist" value="2.0"/>
     <param name="update_min_d" value="0.2"/>
     <param name="update_min_a" value="0.5"/>
-    <param name="odom_frame_id" value="$(arg robot_name)/odom"/>
-    <param name="base_frame_id" value="$(arg robot_name)/base_link"/>
+    <param name="odom_frame_id" value="$(arg entity_name)/odom"/>
+    <param name="base_frame_id" value="$(arg entity_name)/base_link"/>
     <param name="global_frame_id" value="/map"/>
     <param name="resample_interval" value="1"/>
     <param name="transform_tolerance" value="0.1"/>
@@ -77,11 +77,11 @@ global and local costmaps.
     <param name="base_global_planner" value="global_planner/GlobalPlanner" />
     <param name="base_local_planner" value="base_local_planner/TrajectoryPlannerROS" />
 
-    <remap from="map" to="/map" />    
-    
-    <!--<remap from="odom" to="$(arg robot_name)/odom"/>-->
-    <!--<remap from="scan" to="$(arg robot_name)/scan"/>-->    
-    
+    <remap from="map" to="/map" />
+
+    <!--<remap from="odom" to="$(arg entity_name)/odom"/>-->
+    <!--<remap from="scan" to="$(arg entity_name)/scan"/>-->
+
   </node>
 
 </launch>
