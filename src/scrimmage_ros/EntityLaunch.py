@@ -20,6 +20,9 @@ class EntityLaunch():
 
         env['HOME'] = sru.user_home()
 
+        # Ensures that python prints and logs are displayed to screen
+        env['PYTHONUNBUFFERED'] = '1'
+
         # Append the roscore process
         self.processes.append(
             { 'command': "roscore",
