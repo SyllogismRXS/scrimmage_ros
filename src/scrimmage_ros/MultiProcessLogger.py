@@ -11,7 +11,7 @@ import scrimmage_ros.utils as sru
 from enum import Enum
 
 from threading import Thread
-from subprocess import Popen, PIPE
+from subprocess import Popen, PIPE, call
 
 try:
     from queue import Queue, Empty
@@ -50,7 +50,7 @@ class MultiProcessLogger():
             except:
                 pass
 
-    def run(self, process_info):
+    def run(self, process_info, clean_up_processes=[]):
         self.processes = []
         threads = []
         queue = Queue()
@@ -143,3 +143,10 @@ class MultiProcessLogger():
             print('Waiting for processes to exit.')
         shutdown_duration = time.time() - shutdown_start
         print('Time to shutdown = %f sec' % shutdown_duration)
+
+        # Run the optional cleanup processes
+        if len(clean_up_processes) > 0:
+            print('Running cleanup processes...')
+            for process in clean_up_processes:
+                print(process['command'])
+                call(process['command'].split())
