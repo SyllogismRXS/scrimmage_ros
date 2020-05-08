@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 
 import os
+import copy
 import yaml
 from jinja2 import Template
 
@@ -8,13 +9,13 @@ import scrimmage_ros.MultiProcessLogger as MPL
 import scrimmage_ros.SimFilesGenerator as SFG
 import scrimmage_ros.utils as sru
 
+def render_id(string, entity_id):
+    template = Template(string)
+    return template.render(id=entity_id)
+
 def get_name_command(process_info, entity_id):
-    name_t = Template(process_info['name'])
-    name = name_t.render(id=entity_id)
-
-    cmd_t = Template(process_info['command'])
-    cmd = cmd_t.render(id=entity_id)
-
+    name = render_id(process_info['name'], entity_id)
+    cmd = render_id(process_info['command'], entity_id)
     return name, cmd
 
 def create_process(process_info, entity_id, output_dir, env, console, terminal):
@@ -26,10 +27,15 @@ def create_process(process_info, entity_id, output_dir, env, console, terminal):
 
     # Allow the user to append the environment with additional variables
     try:
-        environment = process_info['environment']
+        environment = { render_id(key, entity_id): render_id(value, entity_id)
+                        for key, value in process_info['environment'].items() }
     except:
         environment = dict()
-    env.update(environment)
+
+    # Make a deep copy of the environment to ensure that processes don't step
+    # on each other's variables
+    process_env = copy.deepcopy(env)
+    process_env.update(environment)
 
     # Allow the user to change whether to write to the console or not
     try:
@@ -50,7 +56,7 @@ def create_process(process_info, entity_id, output_dir, env, console, terminal):
 
     return {
         'command': command,
-        'env': env,
+        'env': process_env,
         'console': console,
         'terminal': terminal,
         'file': output_dir + '/%s.log' % name,
@@ -177,6 +183,16 @@ class EntityLaunch():
         print('---------- Clean up ------------')
         for p in self.clean_up_processes:
             print(p['command'])
+
+    def print_environment(self):
+        for p in self.processes:
+            print("==================================================")
+            print('Process: %s' % p['command'])
+            print('### Environment ###')
+
+            for key, value in p['env'].items():
+                print('%s: %s' % (key, value))
+
 
     def run(self):
         mpl = MPL.MultiProcessLogger()
