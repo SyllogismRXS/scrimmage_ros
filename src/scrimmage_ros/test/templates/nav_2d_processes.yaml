@@ -1,0 +1,33 @@
+version: "1.0"
+
+# Specify default values
+defaults:
+    terminal: gnome
+    environment:
+        some_variable: some_value
+
+# Processes that are run before entities are launched
+processes:
+    - name: roscore
+      command: roscore
+      terminal: none
+      post_delay: 1.5
+
+    - name: map_server
+      command: stdbuf -oL roslaunch scrimmage_ros map_server.launch
+      terminal: none
+      
+# Processes that are run for each entity type
+entity_processes:
+    - type: car
+      processes:
+        - name: 'entity{{ id }}'
+          command: 'stdbuf -oL roslaunch scrimmage_ros entity_nav_2d.launch team_id:=1 entity_id:={{ id }}'
+          
+      # Clean up commands run for each entity
+      clean_up:
+        - name: hello
+          command: 'echo "Goodbye, Entity {{ id }}'         
+
+# Overall clean up commands (run once)
+clean_up:

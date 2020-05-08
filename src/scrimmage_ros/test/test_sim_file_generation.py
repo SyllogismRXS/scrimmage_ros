@@ -14,9 +14,3 @@ with tempfile.TemporaryDirectory() as tmp_dir_name:
     print("==================================================================")
     with open(sfg.mission_file_path, 'r') as file:
         print(file.read())
-
-    print("==================================================================")
-    print("ROS Launch File: %s" % sfg.launch_file_path)
-    print("==================================================================")
-    with open(sfg.launch_file_path, 'r') as file:
-        print(file.read())

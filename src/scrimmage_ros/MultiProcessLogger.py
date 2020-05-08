@@ -148,5 +148,4 @@ class MultiProcessLogger():
         if len(clean_up_processes) > 0:
             print('Running cleanup processes...')
             for process in clean_up_processes:
-                print(process['command'])
                 call(process['command'].split())

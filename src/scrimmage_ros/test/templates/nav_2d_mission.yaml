@@ -15,7 +15,8 @@ mission_file:
 
 # Configuration for each entity that will be injected into the mission file
 entities:
-    - template: entity.template.xml
+    - type: car
+      template: entity.template.xml
       config: 
           id: 1
           team_id: 1
@@ -25,7 +26,8 @@ entities:
           z: 0.42
           heading: 0
           
-    - template: entity.template.xml
+    - type: car
+      template: entity.template.xml
       config: 
           id: 2
           team_id: 2

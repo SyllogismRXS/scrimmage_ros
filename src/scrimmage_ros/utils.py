@@ -60,7 +60,7 @@ def gnome_terminal_title(title):
     return "echo -ne \\\"\\033]0;" + title + "\\007\\\""
 
 def gnome_terminal_cmd(title, cmd, log_file):
-    return "gnome-terminal --disable-factory -x bash -c '" + cmd \
+    return "gnome-terminal --disable-factory -- bash -c '" + cmd \
         + " 2>&1 | tee " + log_file + "; exec bash'"
 
 def user_home():

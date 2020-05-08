@@ -13,7 +13,8 @@ mission_file:
         altitude_origin: 0.0
 
 entities:
-    - template: entity.template.xml
+    - type: uav
+      template: entity.template.xml
       config: 
           id: 1
           x: -10
@@ -21,7 +22,8 @@ entities:
           z: 20
           heading: 270
           
-    - template: entity.template.xml
+    - type: uav
+      template: entity.template.xml
       config: 
           id: 2
           x: 10
@@ -29,7 +31,8 @@ entities:
           z: 10
           heading: 0
 
-    - template: entity.template.xml
+    - type: uav
+      template: entity.template.xml
       config: 
           id: 5
           x: -10
