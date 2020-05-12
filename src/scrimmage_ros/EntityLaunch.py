@@ -9,16 +9,17 @@ import scrimmage_ros.MultiProcessLogger as MPL
 import scrimmage_ros.SimFilesGenerator as SFG
 import scrimmage_ros.utils as sru
 
-def render_id(string, entity_id):
-    template = Template(string)
-    return template.render(id=entity_id)
+def render_variables(string, entity_id, base_logs_path, run_dir):
+    template = Template(str(string))
+    return template.render(id=entity_id, base_logs_path=base_logs_path,
+                           run_dir=run_dir)
 
-def get_name_command(process_info, entity_id):
-    name = render_id(process_info['name'], entity_id)
-    cmd = render_id(process_info['command'], entity_id)
+def get_name_command(process_info, entity_id, base_logs_path, run_dir):
+    name = render_variables(process_info['name'], entity_id, base_logs_path, run_dir)
+    cmd = render_variables(process_info['command'], entity_id, base_logs_path, run_dir)
     return name, cmd
 
-def create_process(process_info, entity_id, output_dir, env, console, terminal):
+def create_process(process_info, entity_id, base_logs_path, run_dir, env, console, terminal):
     # Allow user to specify a post delay for a process
     try:
         post_delay = process_info['post_delay']
@@ -27,9 +28,10 @@ def create_process(process_info, entity_id, output_dir, env, console, terminal):
 
     # Allow the user to append the environment with additional variables
     try:
-        environment = { render_id(key, entity_id): render_id(value, entity_id)
+        environment = { render_variables(key, entity_id, base_logs_path, run_dir):
+                        render_variables(value, entity_id, base_logs_path, run_dir)
                         for key, value in process_info['environment'].items() }
-    except:
+    except KeyError:
         environment = dict()
 
     # Make a deep copy of the environment to ensure that processes don't step
@@ -52,20 +54,21 @@ def create_process(process_info, entity_id, output_dir, env, console, terminal):
         pass
 
     # Perform template substitution based on entity_id {{ id }}
-    name, command = get_name_command(process_info, entity_id)
+    name, command = get_name_command(process_info, entity_id, base_logs_path,
+                                     run_dir)
 
     return {
         'command': command,
         'env': process_env,
         'console': console,
         'terminal': terminal,
-        'file': output_dir + '/%s.log' % name,
+        'file': run_dir + '/%s.log' % name,
         'post_delay': post_delay
     }
 
 class EntityLaunch():
     def __init__(self, mission_yaml_filename, processess_yaml_file,
-                 output_dir,  entity_ids=None, entity_type=None):
+                 base_logs_path, run_dir, entity_ids=None, entity_type=None):
         self.entity_ids = entity_ids
 
         # The list of processes to pass to MultiProcessLogger
@@ -89,12 +92,14 @@ class EntityLaunch():
 
         # Append the processes that are run before entities
         for p in processes_list:
-            self.processes.append(create_process(p, 0, output_dir, self.env, True, self.terminal))
+            self.processes.append(create_process(p, 0, base_logs_path, run_dir,
+                                                 self.env, True,
+                                                 self.terminal))
 
         # If the entity_ids is none, use scrimmage to run a simulation
         if self.entity_ids is None:
             # Generate the scrimmage mission file and scrimmage file
-            sfg = SFG.SimFilesGenerator(mission_yaml_filename, output_dir)
+            sfg = SFG.SimFilesGenerator(mission_yaml_filename, run_dir)
 
             # Get the entity IDs from the mission.yaml file
             self.entity_ids = sfg.entity_ids()
@@ -105,7 +110,7 @@ class EntityLaunch():
                   'env': self.env,
                   'console': True,
                   'terminal': self.terminal,
-                  'file': output_dir + '/scrimmage.log',
+                  'file': run_dir + '/scrimmage.log',
                 }
             )
 
@@ -128,7 +133,9 @@ class EntityLaunch():
 
             # Append the entity processes to the processes list
             for p in entity_processes:
-                self.processes.append(create_process(p, entity_id, output_dir, self.env, True, self.terminal))
+                self.processes.append(
+                    create_process(p, entity_id, base_logs_path, run_dir,
+                                   self.env, True, self.terminal))
 
             # Get the clean up processes for this type
             try:
@@ -138,7 +145,9 @@ class EntityLaunch():
 
             # Append the clean up processes for this entity to the clean up list
             for p in entity_clean_up_processes:
-                self.clean_up_processes.append(create_process(p, entity_id, output_dir, self.env, True, self.terminal))
+                self.clean_up_processes.append(
+                    create_process(p, entity_id, base_logs_path, run_dir,
+                                   self.env, True, self.terminal))
 
         # Append the cleanup processes that apply to all entities
         try:
@@ -148,7 +157,9 @@ class EntityLaunch():
 
         try:
             for p in clean_up_process_infos:
-                self.clean_up_processes.append(create_process(p, 0, output_dir, self.env, True, self.terminal))
+                self.clean_up_processes.append(
+                    create_process(p, 0, base_logs_path, run_dir, self.env,
+                                   True, self.terminal))
         except:
             pass
 

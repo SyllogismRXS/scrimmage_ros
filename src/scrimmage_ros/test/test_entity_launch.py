@@ -26,7 +26,7 @@ def main():
     run_dir = sru.make_get_run_dir(logs_path)
 
     entity_launch = EntityLaunch(args.sim_mission_yaml_file,
-                                 args.processes_yaml_file,
+                                 args.processes_yaml_file, logs_path,
                                  run_dir, None, None)
 
     if args.debug:
