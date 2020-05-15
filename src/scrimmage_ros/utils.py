@@ -9,7 +9,12 @@ def ros_find_path(my_string):
     pattern = "\\$\\(find (.+)\\)"
 
     m = re.search(pattern, my_string)
-    ros_package_name = m.group(1)
+    try:
+        ros_package_name = m.group(1)
+    except:
+        # If the group doesn't exist, there isn't anything to replace, just
+        # return the input string
+        return my_string
 
     # Construct the path to the file
     rospack = rospkg.RosPack()
