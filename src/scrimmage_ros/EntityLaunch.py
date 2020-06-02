@@ -68,8 +68,7 @@ def create_process(process_info, entity_id, base_logs_path, run_dir, env, consol
 
 class EntityLaunch():
     def __init__(self, mission_yaml_filename, processess_yaml_file,
-                 base_logs_path, run_dir, entity_ids=None, entity_type=None):
-        self.entity_ids = entity_ids
+                 base_logs_path, run_dir, entity_id=None, entity_type=None):
 
         # The list of processes to pass to MultiProcessLogger
         self.processes = []
@@ -97,7 +96,7 @@ class EntityLaunch():
                                                  self.terminal))
 
         # If the entity_ids is none, use scrimmage to run a simulation
-        if self.entity_ids is None:
+        if entity_id is None:
             # Generate the scrimmage mission file and scrimmage file
             sfg = SFG.SimFilesGenerator(mission_yaml_filename, run_dir)
 
@@ -113,17 +112,20 @@ class EntityLaunch():
                   'file': run_dir + '/scrimmage.log',
                 }
             )
+        else:
+            # If the entity_id is specified, only use this ID, regardless of
+            # what is listed in the mission yaml file.
+            self.entity_ids = [ entity_id ]
 
         # Create a mapping of entity type to process infos
-        entity_type_to_processes = dict()
-        for entity_type_processes in self._processes_yaml['entity_processes']:
-            entity_type = entity_type_processes['type']
-            entity_type_to_processes[entity_type] = entity_type_processes
+        entity_type_to_processes = self._get_entity_type_to_processes()
 
         # Append the processes for each entity's roslaunch
         for entity_id in self.entity_ids:
-            # Get the entity type:
-            entity_type = sfg.entity_id_to_type(entity_id)
+            # If entity_type is not provided, use the entity_type in the yaml
+            # files. Otherwise, we use the manually specified type.
+            if entity_type is None:
+                entity_type = sfg.entity_id_to_type(entity_id)
 
             # Get the entity processes for this type
             try:
@@ -185,6 +187,13 @@ class EntityLaunch():
 
         # Append user-defined environment variables
         self.env.update(environment)
+
+    def _get_entity_type_to_processes(self):
+        entity_type_to_processes = dict()
+        for entity_type_processes in self._processes_yaml['entity_processes']:
+            entity_type = entity_type_processes['type']
+            entity_type_to_processes[entity_type] = entity_type_processes
+        return entity_type_to_processes
 
     def print_processes(self):
         print('---------- Processes ------------')
