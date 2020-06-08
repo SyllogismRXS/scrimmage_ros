@@ -9,14 +9,14 @@ import scrimmage_ros.MultiProcessLogger as MPL
 import scrimmage_ros.SimFilesGenerator as SFG
 import scrimmage_ros.utils as sru
 
-def render_variables(string, entity_id, base_logs_path, run_dir):
+def render_variables(string, entity_id, base_logs_path, run_dir, process_dir):
     template = Template(str(string))
     return template.render(id=entity_id, base_logs_path=base_logs_path,
-                           run_dir=run_dir)
+                           run_dir=run_dir, process_dir=process_dir)
 
-def get_name_command(process_info, entity_id, base_logs_path, run_dir):
-    name = render_variables(process_info['name'], entity_id, base_logs_path, run_dir)
-    cmd = render_variables(process_info['command'], entity_id, base_logs_path, run_dir)
+def get_name_command(process_info, entity_id, base_logs_path, run_dir, process_dir):
+    name = render_variables(process_info['name'], entity_id, base_logs_path, run_dir, process_dir)
+    cmd = render_variables(process_info['command'], entity_id, base_logs_path, run_dir, process_dir)
     return name, cmd
 
 def create_process(process_info, entity_id, base_logs_path, run_dir, env, console, terminal):
@@ -26,10 +26,12 @@ def create_process(process_info, entity_id, base_logs_path, run_dir, env, consol
     except:
         post_delay = 0
 
+    process_dir = run_dir + '/entity%d' % entity_id
+
     # Allow the user to append the environment with additional variables
     try:
-        environment = { render_variables(key, entity_id, base_logs_path, run_dir):
-                        render_variables(value, entity_id, base_logs_path, run_dir)
+        environment = { render_variables(key, entity_id, base_logs_path, run_dir, process_dir):
+                        render_variables(value, entity_id, base_logs_path, run_dir, process_dir)
                         for key, value in process_info['environment'].items() }
     except KeyError:
         environment = dict()
@@ -55,14 +57,14 @@ def create_process(process_info, entity_id, base_logs_path, run_dir, env, consol
 
     # Perform template substitution based on entity_id {{ id }}
     name, command = get_name_command(process_info, entity_id, base_logs_path,
-                                     run_dir)
+                                     run_dir, process_dir)
 
     return {
         'command': command,
         'env': process_env,
         'console': console,
         'terminal': terminal,
-        'file': run_dir + '/%s.log' % name,
+        'file': process_dir + '/%s.log' % name,
         'post_delay': post_delay
     }
 
