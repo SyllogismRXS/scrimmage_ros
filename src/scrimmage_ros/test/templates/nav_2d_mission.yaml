@@ -15,9 +15,9 @@ mission_file:
 
 # Configuration for each entity that will be injected into the mission file
 entities:
-    - type: car
+    - type: car1
       template: entity.template.xml
-      config: 
+      config:
           id: 1
           team_id: 1
           color: 77 77 255
@@ -25,10 +25,10 @@ entities:
           y: 10
           z: 0.42
           heading: 0
-          
-    - type: car
+
+    - type: car2
       template: entity.template.xml
-      config: 
+      config:
           id: 2
           team_id: 2
           color: 0 0 255
@@ -36,5 +36,3 @@ entities:
           y: 20
           z: 0.42
           heading: 0
-
-    

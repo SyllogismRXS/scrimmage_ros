@@ -56,6 +56,9 @@ class SimFilesGenerator():
     def entity_ids(self):
         return self._mission_gen.entity_ids()
 
+    def entity_types_to_id(self):
+        return self._mission_gen.entity_types_to_id()
+
     def entity_id_to_type(self, id):
         return self._mission_gen.entity_id_to_type(id)
 

@@ -1,0 +1,11 @@
+version: "1.0"
+
+entities:
+    - entity_type: car1
+      process_type: car
+
+    - entity_type: car2
+      process_type: car
+
+processes_yaml: nav_2d_processes.yaml
+mission_yaml: nav_2d_mission.yaml

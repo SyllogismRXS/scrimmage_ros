@@ -68,21 +68,44 @@ def create_process(process_info, entity_id, base_logs_path, run_dir, env, consol
         'post_delay': post_delay
     }
 
+def parse_yaml(filepath):
+    # Get the full path to the processes yaml file (ros find substitution)
+    yaml_file_path = sru.ros_find_path(filepath)
+
+    # Parse the processes file
+    with open(yaml_file_path) as f:
+        parsed_yaml = yaml.load(f, Loader=yaml.FullLoader)
+    return parsed_yaml
+
 class EntityLaunch():
-    def __init__(self, mission_yaml_filename, processess_yaml_file,
-                 base_logs_path, run_dir, entity_id=None, entity_type=None):
+    def __init__(self, mission_yaml_filename, processes_yaml_file,
+                 entity_process_map_yaml_file, base_logs_path, run_dir,
+                 entity_id=None, entity_process_type=None):
 
         # The list of processes to pass to MultiProcessLogger
         self.processes = []
         self.clean_up_processes = []
 
-        # Get the full path to the processes yaml file (ros find substitution)
-        processes_yaml_file_path = sru.ros_find_path(processess_yaml_file)
+        # If it exists, Parse the entity to process yaml file
+        if entity_process_map_yaml_file is not None:
+            self._entity_process_map_yaml = parse_yaml(entity_process_map_yaml_file)
 
-        # Parse the processes file
-        with open(processes_yaml_file_path) as f:
-             self._processes_yaml = yaml.load(f, Loader=yaml.FullLoader)
+            # Get the directory that contains the entity process map file:
+            ent_proc_map_dir = os.path.dirname(
+                sru.ros_find_path(entity_process_map_yaml_file))
 
+            if mission_yaml_filename is None:
+                mission_yaml_filename = os.path.join(ent_proc_map_dir,
+                    self._entity_process_map_yaml['mission_yaml'])
+
+            if processes_yaml_file is None:
+                processes_yaml_file = os.path.join(ent_proc_map_dir,
+                    self._entity_process_map_yaml['processes_yaml'])
+
+        # Parse the processes yaml file
+        self._processes_yaml = parse_yaml(processes_yaml_file)
+
+        # Parse the defaults block
         self.parse_defaults()
 
         # Get processes that are run before entities
@@ -97,16 +120,15 @@ class EntityLaunch():
                                                  self.env, True,
                                                  self.terminal))
 
-        # Create a mapping of entity type to process infos
-        entity_type_to_processes = self._get_entity_type_to_processes()
+        # Create a mapping of process type to list of processes
+        process_type_to_processes = self._get_process_type_to_processes()
 
-        # If the entity_ids is none, use scrimmage to run a simulation
+        # If the entity_id is none, use scrimmage to run a simulation
         if entity_id is None:
             # Generate the scrimmage mission file and scrimmage file
             sfg = SFG.SimFilesGenerator(mission_yaml_filename, run_dir)
-
-            # Get the entity IDs from the mission.yaml file
-            self.entity_ids = sfg.entity_ids()
+            # Get the entity types and their IDs from the mission.yaml file
+            entity_types_to_id = sfg.entity_types_to_id()
 
             # Append the scrimmage process
             self.processes.append(
@@ -117,24 +139,28 @@ class EntityLaunch():
                   'file': run_dir + '/scrimmage.log',
                 }
             )
+
+            # Get the mapping from entity_type to process_type
+            entity_type_to_process_type = self._get_entity_type_to_process_type()
+
+            # Create a mapping of the unique entity ID to the non-unique process type
+            self.entity_id_to_process_type = {
+                entity_types_to_id[entity_type] : process_type
+                for (entity_type, process_type) in entity_type_to_process_type.items() }
+
         else:
+            if entity_process_type is None:
+                raise NameError('The process_type must be set when specifying the entity_id.')
+
             # If the entity_id is specified, only use this ID, regardless of
             # what is listed in the mission yaml file.
-            self.entity_ids = [ entity_id ]
+            self.entity_id_to_process_type = { entity_id : entity_process_type }
 
-        # Append the processes for each entity's roslaunch
-        for entity_id in self.entity_ids:
-            # If entity_type is not provided, use the entity_type in the yaml
-            # files. Otherwise, we use the manually specified type.
-            if entity_type is None:
-                try:
-                    entity_type = sfg.entity_id_to_type(entity_id)
-                except:
-                    raise NameError('You must specify the entity_type when specifying the entity_id')
-
-            # Get the entity processes for this type
+        # Append the processes for each entity_id
+        for entity_id, process_type in self.entity_id_to_process_type.items():
+            # Get the entity processes for this process type
             try:
-                entity_processes = entity_type_to_processes[entity_type]['processes']
+                entity_processes = process_type_to_processes[process_type]['processes']
             except:
                 entity_processes = []
 
@@ -146,7 +172,7 @@ class EntityLaunch():
 
             # Get the clean up processes for this type
             try:
-                entity_clean_up_processes = entity_type_to_processes[entity_type]['clean_up']
+                entity_clean_up_processes = process_type_to_processes[entity_type]['clean_up']
             except:
                 entity_clean_up_processes = []
 
@@ -193,12 +219,19 @@ class EntityLaunch():
         # Append user-defined environment variables
         self.env.update(environment)
 
-    def _get_entity_type_to_processes(self):
-        entity_type_to_processes = dict()
+    def _get_process_type_to_processes(self):
+        process_type_to_processes = dict()
         for entity_type_processes in self._processes_yaml['entity_processes']:
             entity_type = entity_type_processes['type']
-            entity_type_to_processes[entity_type] = entity_type_processes
-        return entity_type_to_processes
+            process_type_to_processes[entity_type] = entity_type_processes
+        return process_type_to_processes
+
+    def _get_entity_type_to_process_type(self):
+        entity_type_to_process_type = dict()
+        for entity_type_processes in self._entity_process_map_yaml['entities']:
+            entity_type = entity_type_processes['entity_type']
+            entity_type_to_process_type[entity_type] = entity_type_processes['process_type']
+        return entity_type_to_process_type
 
     def print_processes(self):
         print('---------- Processes ------------')
