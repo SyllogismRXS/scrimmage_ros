@@ -97,6 +97,9 @@ class EntityLaunch():
                                                  self.env, True,
                                                  self.terminal))
 
+        # Create a mapping of entity type to process infos
+        entity_type_to_processes = self._get_entity_type_to_processes()
+
         # If the entity_ids is none, use scrimmage to run a simulation
         if entity_id is None:
             # Generate the scrimmage mission file and scrimmage file
@@ -119,15 +122,15 @@ class EntityLaunch():
             # what is listed in the mission yaml file.
             self.entity_ids = [ entity_id ]
 
-        # Create a mapping of entity type to process infos
-        entity_type_to_processes = self._get_entity_type_to_processes()
-
         # Append the processes for each entity's roslaunch
         for entity_id in self.entity_ids:
             # If entity_type is not provided, use the entity_type in the yaml
             # files. Otherwise, we use the manually specified type.
             if entity_type is None:
-                entity_type = sfg.entity_id_to_type(entity_id)
+                try:
+                    entity_type = sfg.entity_id_to_type(entity_id)
+                except:
+                    raise NameError('You must specify the entity_type when specifying the entity_id')
 
             # Get the entity processes for this type
             try:
