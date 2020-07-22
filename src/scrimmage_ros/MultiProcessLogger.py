@@ -32,6 +32,7 @@ class Terminal(Enum):
     none = 'none'
     gnome = 'gnome'
     tmux = 'tmux'
+    screen = 'screen'
 
     def __str__(self):
         return self.value
@@ -72,10 +73,12 @@ class MultiProcessLogger():
                     title = sru.gnome_terminal_title('my_window')
                     cmd = sru.gnome_terminal_cmd(title, cmd, process_info[i]['file'])
                     new_shell = True
-
                 elif process_info[i]['terminal'] == self.terminal.tmux:
-                    #TODO
-                    cmd = cmd.split()
+                    cmd = "tmux new-session -d -s simvehicle '{0}'".format(cmd)
+                    new_shell = True
+                elif process_info[i]['terminal'] == self.terminal.screen:
+                    cmd = "screen -d -m " + "cmd"
+                    new_shell = True
                 else:
                     cmd = cmd.split()
             else:
