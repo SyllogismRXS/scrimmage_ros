@@ -56,6 +56,18 @@ class MultiProcessLogger():
         threads = []
         queue = Queue()
 
+        start_tmux = False
+        for pi in process_info:
+            if 'terminal' in pi:
+                if pi['terminal'] == self.terminal.tmux:
+                    start_tmux = True
+                    break
+
+        if start_tmux:
+            self.processes.append(Popen('tmux new -d',
+                                        shell=True,
+                                        stderr=PIPE, stdout=PIPE, bufsize=0))
+
         for i in range(len(process_info)):
             # Setup file descriptors for log files
             if 'file' in process_info[i]:
@@ -74,10 +86,17 @@ class MultiProcessLogger():
                     cmd = sru.gnome_terminal_cmd(title, cmd, process_info[i]['file'])
                     new_shell = True
                 elif process_info[i]['terminal'] == self.terminal.tmux:
-                    cmd = "tmux new-session -d -s simvehicle '{0}'".format(cmd)
+                    tmux_needs_session = True
+                    sess_name = 'sess' + str(i)
+                    if 'name' in process_info[i]:
+                        sess_name = process_info[i]['name'] + str(i)
+                    else:
+                        sess_name = 'tmux_sess' + str(i)
+                    # cmd = "tmux new-session -d -s {0} '{1}'".format(sess_name, cmd)
+                    cmd = "tmux new-window '{0}'".format(cmd)
                     new_shell = True
                 elif process_info[i]['terminal'] == self.terminal.screen:
-                    cmd = "screen -d -m " + "cmd"
+                    cmd = "screen -d -m {0}".format(cmd)
                     new_shell = True
                 else:
                     cmd = cmd.split()
