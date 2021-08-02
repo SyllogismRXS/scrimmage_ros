@@ -64,9 +64,17 @@ class MultiProcessLogger():
                     break
 
         if start_tmux:
-            self.processes.append(Popen('tmux new -d',
+            pipe = Popen('echo $TMUX_PANE', shell=True, stdout=PIPE)
+            if (pipe.communicate()[0] == b'\n'):
+                self.processes.append(Popen('tmux new -d',
                                         shell=True,
                                         stderr=PIPE, stdout=PIPE, bufsize=0))
+                clean_up_processes.append({'command': 'tmux kill-server', \
+                                        'env': process_info[0]['env'],
+                                        'console': process_info[0]['console'],  \
+                                        'terminal': process_info[0]['terminal'], \
+                                        'file': '', \
+                                        'post_delay': 0 })
 
         for i in range(len(process_info)):
             # Setup file descriptors for log files
@@ -78,22 +86,20 @@ class MultiProcessLogger():
                 process_info[i]['fd'] = None
 
             cmd = process_info[i]['command']
+            launch_file = process_info[i]['file']
             new_shell = False
 
             if 'terminal' in process_info[i]:
                 if process_info[i]['terminal'] == self.terminal.gnome:
                     title = sru.gnome_terminal_title('my_window')
-                    cmd = sru.gnome_terminal_cmd(title, cmd, process_info[i]['file'])
+                    cmd = sru.gnome_terminal_cmd(title, cmd, launch_file)
                     new_shell = True
                 elif process_info[i]['terminal'] == self.terminal.tmux:
-                    tmux_needs_session = True
-                    sess_name = 'sess' + str(i)
-                    if 'name' in process_info[i]:
-                        sess_name = process_info[i]['name'] + str(i)
-                    else:
-                        sess_name = 'tmux_sess' + str(i)
-                    # cmd = "tmux new-session -d -s {0} '{1}'".format(sess_name, cmd)
-                    cmd = "tmux new-window '{0}'".format(cmd)
+                    options="-d "
+                    for key in process_info[i]['env']:
+                        value = process_info[i]['env'][key]
+                        options = '{0} -e {1}="{2}"'.format(options, key, value)
+                    cmd = sru.tmux_terminal_cmd(cmd, options, launch_file)
                     new_shell = True
                 elif process_info[i]['terminal'] == self.terminal.screen:
                     cmd = "screen -d -m {0}".format(cmd)
